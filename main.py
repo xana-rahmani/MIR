@@ -6,18 +6,16 @@ from hazm import *
 # nltk.download()
 english_stop_words = ['an', 'and', 'for', 'that', 'the', 'with', 'he', 'in', 'can', 'from', 'a', 'to', 'of', 'it', 'talk', 'how', 'you', 'thi', 'about', 'we', 'what', 'on', 'as', 'hi', 'is', 'us', 'our','at']
 english_stop_words_level2 = ['do', 'her', 'be', 'but', 'by', 'she', 'are']
-def prepare_text(text, lang="en"):
 
+
+def prepare_text(text, lang="en"):
     if lang == "en":
         stemmer = nltk.stem.porter.PorterStemmer()
-        #removing punctuations
         tokens = nltk.word_tokenize(text)
         tokens = [tok for tok in tokens if tok not in string.punctuation]
         tokens = [stemmer.stem(t) for t in tokens]
-        tokens = [t.lower() for t in tokens if t.isalpha()]
+        tokens = [t.lower() for t in tokens if t.isalpha()] # removing punctuations
         tokens = [tok for tok in tokens if tok not in english_stop_words + english_stop_words_level2]
-
-
     elif lang == "fa":
         normalizer = Normalizer()
         text = normalizer.normalize(text)
@@ -25,10 +23,6 @@ def prepare_text(text, lang="en"):
         punctuations = [ '؟', '!', '.', ',', '،', '?', ')', '(', ')', '(', '\n']
         tokens = [tok for tok in tokens if tok not in punctuations and tok not in string.punctuation]
         tokens = [Stemmer().stem(t) for t in tokens]
-
-
-
-
     return tokens
 
 
@@ -62,7 +56,8 @@ def main():
         print(english_tokens.get(2))
         print(english_tokens.get(3))
         print(english_tokens.get(4))
-    ###persian
+
+    ### persian
     persian_tokens = {}
     persian_token_repitition = {}
     number_of_persian_tokens = 0
@@ -88,7 +83,6 @@ def main():
     print(persian_tokens['107456'])
 
     print([t for t in persian_token_repitition.keys() if persian_token_repitition[t] > 0.0045 * number_of_tokens])
-
 
 
 main()
