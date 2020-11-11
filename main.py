@@ -4,23 +4,25 @@ import nltk
 import xml.etree.ElementTree as ET
 from hazm import *
 # nltk.download()
-english_stop_words = ['an', 'and', 'for', 'that', 'the', 'with', 'he', 'in', 'can', 'from', 'a', 'to', 'of', 'it', 'talk', 'how', 'you', 'thi', 'about', 'we', 'what', 'on', 'as', 'hi', 'is', 'us', 'our','at']
+english_stop_words = ['an', 'and', 'for', 'that', 'the', 'with', 'he', 'in', 'can', 'from', 'a', 'to', 'of', 'it',
+                      'talk', 'how', 'you', 'thi', 'about', 'we', 'what', 'on', 'as', 'hi', 'is', 'us', 'our', 'at']
 english_stop_words_level2 = ['do', 'her', 'be', 'but', 'by', 'she', 'are']
 
 
 def prepare_text(text, lang="en"):
+    tokens = []
     if lang == "en":
         stemmer = nltk.stem.porter.PorterStemmer()
         tokens = nltk.word_tokenize(text)
-        tokens = [tok for tok in tokens if tok not in string.punctuation]
         tokens = [stemmer.stem(t) for t in tokens]
-        tokens = [t.lower() for t in tokens if t.isalpha()] # removing punctuations
+        tokens = [tok for tok in tokens if tok not in string.punctuation]  # removing punctuations
+        tokens = [t.lower() for t in tokens if t.isalpha()]  # removing punctuations
         tokens = [tok for tok in tokens if tok not in english_stop_words + english_stop_words_level2]
     elif lang == "fa":
         normalizer = Normalizer()
         text = normalizer.normalize(text)
         tokens = word_tokenize(text)
-        punctuations = [ '؟', '!', '.', ',', '،', '?', ')', '(', ')', '(', '\n']
+        punctuations = ['؟', '!', '.', ',', '،', '?', ')', '(', ')', '(', '\n']
         tokens = [tok for tok in tokens if tok not in punctuations and tok not in string.punctuation]
         tokens = [Stemmer().stem(t) for t in tokens]
     return tokens
@@ -29,13 +31,13 @@ def prepare_text(text, lang="en"):
 def main():
     english_tokens = {}
     persian_tokens = {}
-    with open('data/ted_talks.csv',encoding= 'utf-8') as csv_file:
+    with open('data/ted_talks.csv', encoding='utf-8') as csv_file:
         read_csv = csv.reader(csv_file)
         fields = next(read_csv)
         title_index = fields.index("title")
         description_index = fields.index("description")
         doc_id = 1
-        token_repition = {}
+        token_repetition = {}
         number_of_tokens = 0
         for row in read_csv:
             title_tokens = prepare_text(text=row[title_index], lang="en")
@@ -46,10 +48,10 @@ def main():
             }
             number_of_tokens += len(title_tokens) + len(description_tokens)
             for tok in title_tokens + description_tokens:
-                if tok not in token_repition.keys():
-                    token_repition[tok] = 1
+                if tok not in token_repetition.keys():
+                    token_repetition[tok] = 1
                 else:
-                    token_repition[tok] += 1
+                    token_repetition[tok] += 1
             doc_id += 1
         # Test
         print(english_tokens.get(1))
