@@ -1,11 +1,13 @@
 import csv
+import string
 import nltk
+# nltk.download()
 
 
 def prepare_text(text, lang="en"):
     if lang == "en":
         tokens = nltk.word_tokenize(text)
-
+        tokens = [t.lower() for t in tokens if t.isalpha()]
     return tokens
 
 
@@ -23,10 +25,11 @@ def main():
                 "description":  prepare_text(text=row[description_index], lang="en")
             }
             doc_id += 1
-
         # Test
-        print(token[0])
-        print(token[1])
+        print(token.get(1))
+        print(token.get(2))
+        print(token.get(3))
+        print(token.get(4))
 
 
 main()
