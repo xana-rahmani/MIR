@@ -5,9 +5,11 @@ import nltk
 
 
 def prepare_text(text, lang="en"):
+    stemmer = nltk.stem.porter.PorterStemmer()
     if lang == "en":
         tokens = nltk.word_tokenize(text)
         tokens = [t.lower() for t in tokens if t.isalpha()]
+        tokens = [stemmer.stem(t) for t in tokens]
     return tokens
 
 
