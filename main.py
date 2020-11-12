@@ -10,7 +10,7 @@ English_stop_words_level1 = ['an', 'and', 'for', 'that', 'the', 'with', 'he', 'i
 English_stop_words_level2 = ['do', 'her', 'be', 'but', 'by', 'she', 'are']
 
 Persian_stop_words_level1 = ['را', 'با', 'به', 'و', 'آن', 'که', 'از', 'این', 'بر', 'در', 'یا', 'تا']
-Persian_stop_words_level2 = ['اس', 'کرد', 'ایر', 'دو',  'یک', 'سال', 'نیز', 'بود', 'شد', 'خود', 'برا','دارد']
+Persian_stop_words_level2 = ['اس', 'کرد', 'ایر', 'دو',  'یک', 'سال', 'نیز', 'بود', 'شد', 'خود', 'برا','دارد'  ,'']
 
 
 def prepare_text(text, lang="en"):
@@ -24,9 +24,9 @@ def prepare_text(text, lang="en"):
         tokens = [tok for tok in tokens if tok not in English_stop_words_level1 + English_stop_words_level2]
     elif lang == "fa":
         normalizer = Normalizer()
-        punctuations = [']]', '[[', '[', ']', '؟', '!', '.', ',', '،', '?', ')', '(', ')', '(', '\n', '==', '===', '«',
+        punctuations = [']]', '[[', '[', ']', '؟', '!', '.', ',', '،', '?', ')', '(', ')', '(', '\n', '=','==', '===', '«',
                         '»',
-                        '//www', 'http', '</ref>', '||', '<ref', '<ref>', 'name=', '|-', 'of', '–']
+                        '//www', 'http', '</ref>', '||', '<ref', '<ref>', 'name=', '|-', 'of', '–','|','-']
         for punc in punctuations:
             text = text.replace(punc,' ')
         text = normalizer.normalize(text)
@@ -110,15 +110,17 @@ def main():
     # print persian_tokens[ 0 : 10 ]
     j = 0
     for i in persian_tokens.keys():
-        print("## ", i)
-        print(persian_tokens[i])
-        print("--------------------------------------------------------------------------")
+        # print("## ", i)
+        # print(persian_tokens[i])
+        # print("--------------------------------------------------------------------------")
         if j == 10:
             break
         j += 1
 
     z = 0.0025
-    print([t for t in persian_token_repetition.keys() if persian_token_repetition[t] > z * number_of_persian_tokens])
+    # print([t for t in persian_token_repetition.keys() if persian_token_repetition[t] > z * number_of_persian_tokens])
+    print(persian_tokens[5])
+    return english_tokens,token_repetition,persian_tokens,persian_token_repetition
 
     # z = 0.0025
     # ['اس', 'کرد', 'تاریخ', 'ایر', 'دو', 'رده', 'شهر', 'کشور', 'نا',
@@ -132,4 +134,4 @@ def main():
     # , 'میلاد', 'تا', 'دیگر', 'برا', 'ه', 'یا', 'او', 'پرونده', 'ب', 'عنو', '|-', 'of', '–', '<ref>', 'آمریکا', '||']
 
 
-main()
+
