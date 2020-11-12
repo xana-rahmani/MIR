@@ -10,7 +10,7 @@ English_stop_words_level1 = ['an', 'and', 'for', 'that', 'the', 'with', 'he', 'i
 English_stop_words_level2 = ['do', 'her', 'be', 'but', 'by', 'she', 'are']
 
 Persian_stop_words_level1 = ['را', 'با', 'به', 'و', 'آن', 'که', 'از', 'این', 'بر', 'در', 'یا', 'تا']
-Persian_stop_words_level2 = ['اس', 'کرد', 'ایر', 'دو',  'یک', 'سال', 'نیز', 'بود', 'شد', 'خود', 'برا']
+Persian_stop_words_level2 = ['اس', 'کرد', 'ایر', 'دو',  'یک', 'سال', 'نیز', 'بود', 'شد', 'خود', 'برا','دارد']
 
 
 def prepare_text(text, lang="en"):
@@ -24,14 +24,19 @@ def prepare_text(text, lang="en"):
         tokens = [tok for tok in tokens if tok not in English_stop_words_level1 + English_stop_words_level2]
     elif lang == "fa":
         normalizer = Normalizer()
+        punctuations = [']]', '[[', '[', ']', '؟', '!', '.', ',', '،', '?', ')', '(', ')', '(', '\n', '==', '===', '«',
+                        '»',
+                        '//www', 'http', '</ref>', '||', '<ref', '<ref>', 'name=', '|-', 'of', '–']
+        for punc in punctuations:
+            text = text.replace(punc,' ')
         text = normalizer.normalize(text)
         tokens = word_tokenize(text)
-        punctuations = [']]','[[','[',']','؟', '!', '.', ',', '،', '?', ')', '(', ')', '(', '\n', '==', '===', '«', '»',
-                        '//www', 'http', '</ref>', '||', '<ref', '<ref>', 'name=', '|-', 'of', '–']
+
         tokens = [tok.replace('\u200c', '').replace(' ', '') for tok in tokens if
                   tok not in punctuations and tok not in string.punctuation]
-        tokens = [tok for tok in tokens if tok not in Persian_stop_words_level1 + Persian_stop_words_level2]
         tokens = [Stemmer().stem(t) for t in tokens]
+        tokens = [tok for tok in tokens if tok not in Persian_stop_words_level1 + Persian_stop_words_level2]
+
     return tokens
 
 
