@@ -10,7 +10,7 @@ English_stop_words_level1 = ['an', 'and', 'for', 'that', 'the', 'with', 'he', 'i
 English_stop_words_level2 = ['do', 'her', 'be', 'but', 'by', 'she', 'are']
 
 Persian_stop_words_level1 = ['را', 'با', 'به', 'و', 'آن', 'که', 'از', 'این', 'بر', 'در', 'یا', 'تا']
-Persian_stop_words_level2 = ['اس', 'کرد', 'ایر', 'دو', ,  'یک', 'سال', 'نیز', 'بود', 'شد', 'خود', 'برا']
+Persian_stop_words_level2 = ['اس', 'کرد', 'ایر', 'دو',  'یک', 'سال', 'نیز', 'بود', 'شد', 'خود', 'برا']
 
 
 def prepare_text(text, lang="en"):
