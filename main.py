@@ -4,14 +4,13 @@ import nltk
 import xml.etree.ElementTree as ET
 from hazm import *
 
-
 English_stop_words_level1 = ['an', 'and', 'for', 'that', 'the', 'with', 'he', 'in', 'can', 'from', 'a', 'to', 'of',
                              'it', 'talk', 'how', 'you', 'thi', 'about', 'we', 'what', 'on', 'as', 'hi', 'is', 'us',
                              'our', 'at']
 English_stop_words_level2 = ['do', 'her', 'be', 'but', 'by', 'she', 'are']
 
 Persian_stop_words_level1 = ['را', 'با', 'به', 'و', 'آن', 'که', 'از', 'این', 'بر', 'در', 'یا', 'تا']
-Persian_stop_words_level2 = []
+Persian_stop_words_level2 = ['اس', 'کرد', 'ایر', 'دو', ,  'یک', 'سال', 'نیز', 'بود', 'شد', 'خود', 'برا']
 
 
 def prepare_text(text, lang="en"):
@@ -28,8 +27,9 @@ def prepare_text(text, lang="en"):
         text = normalizer.normalize(text)
         tokens = word_tokenize(text)
         punctuations = ['؟', '!', '.', ',', '،', '?', ')', '(', ')', '(', '\n', '==', '===', '«', '»',
-                        '//www', 'http', '</ref>', '||', '<ref',  '<ref>', 'name=', '|-', 'of', '–']
-        tokens = [tok.replace('\u200c', '') for tok in tokens if tok not in punctuations and tok not in string.punctuation]
+                        '//www', 'http', '</ref>', '||', '<ref', '<ref>', 'name=', '|-', 'of', '–']
+        tokens = [tok.replace('\u200c', '').replace(' ', '') for tok in tokens if
+                  tok not in punctuations and tok not in string.punctuation]
         tokens = [tok for tok in tokens if tok not in Persian_stop_words_level1 + Persian_stop_words_level2]
         tokens = [Stemmer().stem(t) for t in tokens]
     return tokens
@@ -66,9 +66,9 @@ def main():
             doc_id += 1
 
     """########################################
-    
+
                     Persian 
-    
+
     ########################################"""
     persian_tokens = {}
     persian_token_repetition = {}
@@ -76,11 +76,11 @@ def main():
     root = ET.parse('data/Persian.xml').getroot()
     file_path = "{http://www.mediawiki.org/xml/export-0.10/}"
     persian_ids = [id_tag.text for id_tag in root.iter(file_path + 'id')]
-    i = 0
+    i = 1
     for title_tag in root.iter(file_path + 'title'):
         title_tokens = prepare_text(text=title_tag.text, lang="fa")
         number_of_persian_tokens += len(title_tokens)
-        persian_tokens[persian_ids[2 * i]] = {
+        persian_tokens[i] = {
             "title_token": title_tokens,
         }
         for tok in title_tokens:
@@ -90,11 +90,11 @@ def main():
                 persian_token_repetition[tok] += 1
         i += 1
 
-    i = 0
+    i = 1
     for text_tag in root.iter(file_path + 'text'):
         description_tokens = prepare_text(text=text_tag.text, lang="fa")
         number_of_persian_tokens += len(description_tokens)
-        persian_tokens[persian_ids[2 * i]]["description"] = description_tokens
+        persian_tokens[i]["description"] = description_tokens
         for tok in description_tokens:
             if tok not in persian_token_repetition.keys():
                 persian_token_repetition[tok] = 1
