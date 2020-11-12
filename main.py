@@ -1,12 +1,16 @@
 import csv
 import string
 import nltk
+import time
 import xml.etree.ElementTree as ET
 from hazm import *
 # nltk.download()
 english_stop_words = ['an', 'and', 'for', 'that', 'the', 'with', 'he', 'in', 'can', 'from', 'a', 'to', 'of', 'it',
                       'talk', 'how', 'you', 'thi', 'about', 'we', 'what', 'on', 'as', 'hi', 'is', 'us', 'our', 'at']
 english_stop_words_level2 = ['do', 'her', 'be', 'but', 'by', 'she', 'are']
+
+persian_extra_punctuations = ['==', '===', '«', '»', '//www', 'http', '</ref>', '||', '<ref',  '<ref>', 'name=',
+                              '|-', 'of', '–']
 
 
 def prepare_text(text, lang="en"):
@@ -24,6 +28,7 @@ def prepare_text(text, lang="en"):
         tokens = word_tokenize(text)
         punctuations = ['؟', '!', '.', ',', '،', '?', ')', '(', ')', '(', '\n']
         tokens = [tok for tok in tokens if tok not in punctuations and tok not in string.punctuation]
+        tokens = [tok for tok in tokens if tok not in persian_extra_punctuations]
         tokens = [Stemmer().stem(t) for t in tokens]
     return tokens
 
@@ -54,14 +59,14 @@ def main():
                     token_repetition[tok] += 1
             doc_id += 1
         # Test
-        print(english_tokens.get(1))
-        print(english_tokens.get(2))
-        print(english_tokens.get(3))
-        print(english_tokens.get(4))
+        # print(english_tokens.get(1))
+        # print(english_tokens.get(2))
+        # print(english_tokens.get(3))
+        # print(english_tokens.get(4))
 
-    ### persian
+    """ persian """
     persian_tokens = {}
-    persian_token_repitition = {}
+    persian_token_repetition = {}
     number_of_persian_tokens = 0
     root = ET.parse('data/Persian.xml').getroot()
     persian_titles = [title_tag.text for title_tag in root.iter('{http://www.mediawiki.org/xml/export-0.10/}title')]
@@ -76,15 +81,27 @@ def main():
         }
         number_of_persian_tokens += len(title_tokens) + len(description_tokens)
         for tok in title_tokens + description_tokens:
-            if tok not in persian_token_repitition.keys():
-                persian_token_repitition[tok] = 1
+            if tok not in persian_token_repetition.keys():
+                persian_token_repetition[tok] = 1
             else:
-                persian_token_repitition[tok] += 1
+                persian_token_repetition[tok] += 1
 
-    print(persian_tokens['3014'])
-    print(persian_tokens['107456'])
+    z = 0.0015
+    print([t for t in persian_token_repetition.keys() if persian_token_repetition[t] > z * number_of_persian_tokens])
 
-    print([t for t in persian_token_repitition.keys() if persian_token_repitition[t] > 0.0045 * number_of_tokens])
+    # z = 0.0035
+    # ['از', 'اس', 'که', 'آن', 'و', 'به', '==',
+    # 'رده', 'یک', '«', '»', '//www', '</ref>', 'شهر', 'این', 'در', 'سال', 'با', 'را']
 
+    # z = 0.0025
+    # level1: ['از', 'اس', 'که', 'نا', 'آن', 'بر', 'و', 'به', '==', 'رده', 'ایر', 'یک', '«', '»', '//www', '</ref>',
+    # 'شهر', 'این', 'در', 'کشور', 'سال', 'http', 'با', 'را', 'تاریخ', 'تا', 'برا', '||']
+
+    # z = 0.0015
+    # ['از', 'اس', 'که', 'نا', 'آن', 'بر', 'و', 'به', 'کرد'
+    # , '==', 'رده', 'ایر', 'یک', '<ref',
+    # 'name=', '«', '»', 'یادکرد', '//www', '</ref>', 'شهر', 'این', 'در',
+    # 'دارد', 'کشور', 'سال', 'http', '===', 'با', 'دو', 'زب', 'را', 'نیز', 'بود', 'شد', 'بزرگ', 'تاریخ', 'خود', 'شده'
+    # , 'میلاد', 'تا', 'دیگر', 'برا', 'ه', 'یا', 'او', 'پرونده', 'ب', 'عنو', '|-', 'of', '–', '<ref>', 'آمریکا', '||']
 
 main()
