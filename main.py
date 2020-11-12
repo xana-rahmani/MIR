@@ -26,7 +26,7 @@ def prepare_text(text, lang="en"):
         normalizer = Normalizer()
         text = normalizer.normalize(text)
         tokens = word_tokenize(text)
-        punctuations = ['؟', '!', '.', ',', '،', '?', ')', '(', ')', '(', '\n', '==', '===', '«', '»',
+        punctuations = [']]','[[','[',']','؟', '!', '.', ',', '،', '?', ')', '(', ')', '(', '\n', '==', '===', '«', '»',
                         '//www', 'http', '</ref>', '||', '<ref', '<ref>', 'name=', '|-', 'of', '–']
         tokens = [tok.replace('\u200c', '').replace(' ', '') for tok in tokens if
                   tok not in punctuations and tok not in string.punctuation]
