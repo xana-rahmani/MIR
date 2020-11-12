@@ -1,16 +1,17 @@
 import csv
 import string
 import nltk
-import time
 import xml.etree.ElementTree as ET
 from hazm import *
-# nltk.download()
-english_stop_words = ['an', 'and', 'for', 'that', 'the', 'with', 'he', 'in', 'can', 'from', 'a', 'to', 'of', 'it',
-                      'talk', 'how', 'you', 'thi', 'about', 'we', 'what', 'on', 'as', 'hi', 'is', 'us', 'our', 'at']
-english_stop_words_level2 = ['do', 'her', 'be', 'but', 'by', 'she', 'are']
 
-persian_extra_punctuations = ['==', '===', '«', '»', '//www', 'http', '</ref>', '||', '<ref',  '<ref>', 'name=',
-                              '|-', 'of', '–']
+
+English_stop_words_level1 = ['an', 'and', 'for', 'that', 'the', 'with', 'he', 'in', 'can', 'from', 'a', 'to', 'of',
+                             'it', 'talk', 'how', 'you', 'thi', 'about', 'we', 'what', 'on', 'as', 'hi', 'is', 'us',
+                             'our', 'at']
+English_stop_words_level2 = ['do', 'her', 'be', 'but', 'by', 'she', 'are']
+
+Persian_stop_words_level1 = ['را', 'با', 'به', 'و', 'آن', 'که', 'از', 'این', 'بر', 'در', 'یا', 'تا']
+Persian_stop_words_level2 = []
 
 
 def prepare_text(text, lang="en"):
@@ -21,21 +22,26 @@ def prepare_text(text, lang="en"):
         tokens = [stemmer.stem(t) for t in tokens]
         tokens = [tok for tok in tokens if tok not in string.punctuation]  # removing punctuations
         tokens = [t.lower() for t in tokens if t.isalpha()]  # removing punctuations
-        tokens = [tok for tok in tokens if tok not in english_stop_words + english_stop_words_level2]
+        tokens = [tok for tok in tokens if tok not in English_stop_words_level1 + English_stop_words_level2]
     elif lang == "fa":
         normalizer = Normalizer()
         text = normalizer.normalize(text)
         tokens = word_tokenize(text)
-        punctuations = ['؟', '!', '.', ',', '،', '?', ')', '(', ')', '(', '\n']
+        punctuations = ['؟', '!', '.', ',', '،', '?', ')', '(', ')', '(', '\n', '==', '===', '«', '»',
+                        '//www', 'http', '</ref>', '||', '<ref',  '<ref>', 'name=', '|-', 'of', '–']
         tokens = [tok for tok in tokens if tok not in punctuations and tok not in string.punctuation]
-        tokens = [tok for tok in tokens if tok not in persian_extra_punctuations]
+        tokens = [tok for tok in tokens if tok not in Persian_stop_words_level1 + Persian_stop_words_level2]
         tokens = [Stemmer().stem(t) for t in tokens]
     return tokens
 
 
 def main():
+    """########################################
+
+                    English
+
+    ########################################"""
     english_tokens = {}
-    persian_tokens = {}
     with open('data/ted_talks.csv', encoding='utf-8') as csv_file:
         read_csv = csv.reader(csv_file)
         fields = next(read_csv)
@@ -58,44 +64,60 @@ def main():
                 else:
                     token_repetition[tok] += 1
             doc_id += 1
-        # Test
-        # print(english_tokens.get(1))
-        # print(english_tokens.get(2))
-        # print(english_tokens.get(3))
-        # print(english_tokens.get(4))
 
-    """ persian """
+    """########################################
+    
+                    Persian 
+    
+    ########################################"""
     persian_tokens = {}
     persian_token_repetition = {}
     number_of_persian_tokens = 0
     root = ET.parse('data/Persian.xml').getroot()
-    persian_titles = [title_tag.text for title_tag in root.iter('{http://www.mediawiki.org/xml/export-0.10/}title')]
-    persian_descriptions = [text_tag.text for text_tag in root.iter('{http://www.mediawiki.org/xml/export-0.10/}text')]
-    persian_ids = [id_tag.text for id_tag in root.iter('{http://www.mediawiki.org/xml/export-0.10/}id')]
-    for i in range(len(persian_titles)):
-        title_tokens = prepare_text(text=persian_titles[i], lang="fa")
-        description_tokens = prepare_text(text=persian_descriptions[i], lang="fa")
+    file_path = "{http://www.mediawiki.org/xml/export-0.10/}"
+    persian_ids = [id_tag.text for id_tag in root.iter(file_path + 'id')]
+    i = 0
+    for title_tag in root.iter(file_path + 'title'):
+        title_tokens = prepare_text(text=title_tag.text, lang="fa")
+        number_of_persian_tokens += len(title_tokens)
         persian_tokens[persian_ids[2 * i]] = {
             "title_token": title_tokens,
-            "description": description_tokens
         }
-        number_of_persian_tokens += len(title_tokens) + len(description_tokens)
-        for tok in title_tokens + description_tokens:
+        for tok in title_tokens:
             if tok not in persian_token_repetition.keys():
                 persian_token_repetition[tok] = 1
             else:
                 persian_token_repetition[tok] += 1
+        i += 1
 
-    z = 0.0015
+    i = 0
+    for text_tag in root.iter(file_path + 'text'):
+        description_tokens = prepare_text(text=text_tag.text, lang="fa")
+        number_of_persian_tokens += len(description_tokens)
+        persian_tokens[persian_ids[2 * i]]["description"] = description_tokens
+        for tok in description_tokens:
+            if tok not in persian_token_repetition.keys():
+                persian_token_repetition[tok] = 1
+            else:
+                persian_token_repetition[tok] += 1
+        i += 1
+
+    # print persian_tokens[ 0 : 10 ]
+    j = 0
+    for i in persian_tokens.keys():
+        print("## ", i)
+        print(persian_tokens[i])
+        print("--------------------------------------------------------------------------")
+        if j == 10:
+            break
+        j += 1
+
+    z = 0.0025
     print([t for t in persian_token_repetition.keys() if persian_token_repetition[t] > z * number_of_persian_tokens])
 
-    # z = 0.0035
-    # ['از', 'اس', 'که', 'آن', 'و', 'به', '==',
-    # 'رده', 'یک', '«', '»', '//www', '</ref>', 'شهر', 'این', 'در', 'سال', 'با', 'را']
-
     # z = 0.0025
-    # level1: ['از', 'اس', 'که', 'نا', 'آن', 'بر', 'و', 'به', '==', 'رده', 'ایر', 'یک', '«', '»', '//www', '</ref>',
-    # 'شهر', 'این', 'در', 'کشور', 'سال', 'http', 'با', 'را', 'تاریخ', 'تا', 'برا', '||']
+    # ['اس', 'کرد', 'تاریخ', 'ایر', 'دو', 'رده', 'شهر', 'کشور', 'نا',
+    # 'میلاد', 'یک', 'سال', 'نیز', 'بود', 'شد', 'خود', 'برا']
 
     # z = 0.0015
     # ['از', 'اس', 'که', 'نا', 'آن', 'بر', 'و', 'به', 'کرد'
@@ -103,5 +125,6 @@ def main():
     # 'name=', '«', '»', 'یادکرد', '//www', '</ref>', 'شهر', 'این', 'در',
     # 'دارد', 'کشور', 'سال', 'http', '===', 'با', 'دو', 'زب', 'را', 'نیز', 'بود', 'شد', 'بزرگ', 'تاریخ', 'خود', 'شده'
     # , 'میلاد', 'تا', 'دیگر', 'برا', 'ه', 'یا', 'او', 'پرونده', 'ب', 'عنو', '|-', 'of', '–', '<ref>', 'آمریکا', '||']
+
 
 main()
