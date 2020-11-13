@@ -25,11 +25,11 @@ def prepare_text(text, lang="en"):
     elif lang == "fa":
         normalizer = Normalizer()
         punctuations = [']]', '[[', '[', ']', '؟', '!', '.', ',', '،', '?', ')', '(', ')', '(', '=', '==', '===',
-                        '«', '»', '//www', 'http', '</ref>', '||', '<ref', '<ref>', 'name=', '|-', 'of', '–', '/'
+                        '«', '»', '//www', 'http', '</ref>', '||', '<ref', '<ref>', 'name=', '|-', 'of', '–', '/',
                         '|', '-', '♦️', '♠️', '≈', '&', '←', '†', '‘', '—', '★', '≥',  '\n', '\'', '"', '\\', '//',
-                        '</sup>', '<sup>', '<math>', '<math>', '*', '+', '<', '>', ';', '_', '$']
-        for punc in punctuations:
-            text = text.replace(punc,' ')
+                        '</sup>', '<sup>', '<math>', '<math>', '*', '+', '<', '>', ';', '_', '$', '#', "ş", "٪", ""]
+        for p in punctuations:
+            text = text.replace(p, ' ')
         text = normalizer.normalize(text)
         tokens = word_tokenize(text)
 
