@@ -31,12 +31,16 @@ def prepare_text(text, lang="en"):
         for p in punctuations:
             text = text.replace(p, ' ')
         text = normalizer.normalize(text)
-        tokens = word_tokenize(text)
-
-        tokens = [tok.replace('\u200c', '').replace(' ', '') for tok in tokens if
-                  tok not in punctuations and tok not in string.punctuation]
-        tokens = [Stemmer().stem(t) for t in tokens]
-        tokens = [tok for tok in tokens if tok not in Persian_stop_words_level1 + Persian_stop_words_level2]
+        temp_tokens = word_tokenize(text)
+        tokens = []
+        for tok in temp_tokens:
+            if tok in punctuations or tok in string.punctuation:
+                continue
+            tok = tok.replace('\u200c', '').replace(' ', '')
+            tok = Stemmer().stem(tok)
+            if tok in (Persian_stop_words_level1 + Persian_stop_words_level2):
+                continue
+            tokens.append(tok)
 
     return tokens
 
