@@ -56,8 +56,7 @@ def create_inverted_index(lang='en'):
             i += 1
         i += 1
     import json
-    for i in index.keys():
-        print(i)
+
     with open(output_path, 'w', encoding='utf-8') as f:
         f.write(json.dumps(index))
 
