@@ -1,3 +1,4 @@
+import json
 from main import read_file_and_create_token as rf_ct
 
 
@@ -55,10 +56,9 @@ def create_inverted_index(lang='en'):
                 [tokens_of_dictionary[i + 1]['posting']])
             i += 1
         i += 1
-    import json
 
     with open(output_path, 'w', encoding='utf-8') as f:
-        f.write(json.dumps(index))
+        f.write(json.dumps(index, ensure_ascii=False))
 
 
 def create_bigrame(lang='en'):
