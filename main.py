@@ -40,98 +40,64 @@ def prepare_text(text, lang="en"):
     return tokens
 
 
-def main():
-    """########################################
+def read_file_and_create_token(lang="en"):
+    if lang == "en":
+        english_tokens = {}
+        with open('data/ted_talks.csv', encoding='utf-8') as csv_file:
+            read_csv = csv.reader(csv_file)
+            fields = next(read_csv)
+            title_index = fields.index("title")
+            description_index = fields.index("description")
+            doc_id = 1
+            english_token_repetition = {}
+            number_of_tokens = 0
+            for row in read_csv:
+                title_tokens = prepare_text(text=row[title_index], lang="en")
+                description_tokens = prepare_text(text=row[description_index], lang="en")
+                english_tokens[doc_id] = {
+                    "title_token": title_tokens,
+                    "description": description_tokens
+                }
+                number_of_tokens += len(title_tokens) + len(description_tokens)
+                for tok in title_tokens + description_tokens:
+                    if tok not in english_token_repetition.keys():
+                        english_token_repetition[tok] = 1
+                    else:
+                        english_token_repetition[tok] += 1
+                doc_id += 1
+        return english_tokens, english_token_repetition
 
-                    English
-
-    ########################################"""
-    english_tokens = {}
-    with open('data/ted_talks.csv', encoding='utf-8') as csv_file:
-        read_csv = csv.reader(csv_file)
-        fields = next(read_csv)
-        title_index = fields.index("title")
-        description_index = fields.index("description")
-        doc_id = 1
-        token_repetition = {}
-        number_of_tokens = 0
-        for row in read_csv:
-            title_tokens = prepare_text(text=row[title_index], lang="en")
-            description_tokens = prepare_text(text=row[description_index], lang="en")
-            english_tokens[doc_id] = {
+    if lang == "fa":
+        persian_tokens = {}
+        persian_token_repetition = {}
+        number_of_persian_tokens = 0
+        root = ET.parse('data/Persian.xml').getroot()
+        file_path = "{http://www.mediawiki.org/xml/export-0.10/}"
+        persian_ids = [id_tag.text for id_tag in root.iter(file_path + 'id')]
+        i = 1
+        for title_tag in root.iter(file_path + 'title'):
+            title_tokens = prepare_text(text=title_tag.text, lang="fa")
+            number_of_persian_tokens += len(title_tokens)
+            persian_tokens[i] = {
                 "title_token": title_tokens,
-                "description": description_tokens
             }
-            number_of_tokens += len(title_tokens) + len(description_tokens)
-            for tok in title_tokens + description_tokens:
-                if tok not in token_repetition.keys():
-                    token_repetition[tok] = 1
+            for tok in title_tokens:
+                if tok not in persian_token_repetition.keys():
+                    persian_token_repetition[tok] = 1
                 else:
-                    token_repetition[tok] += 1
-            doc_id += 1
+                    persian_token_repetition[tok] += 1
+            i += 1
 
-    """########################################
+        i = 1
+        for text_tag in root.iter(file_path + 'text'):
+            description_tokens = prepare_text(text=text_tag.text, lang="fa")
+            number_of_persian_tokens += len(description_tokens)
+            persian_tokens[i]["description"] = description_tokens
+            for tok in description_tokens:
+                if tok not in persian_token_repetition.keys():
+                    persian_token_repetition[tok] = 1
+                else:
+                    persian_token_repetition[tok] += 1
+            i += 1
 
-                    Persian 
-
-    ########################################"""
-    persian_tokens = {}
-    persian_token_repetition = {}
-    number_of_persian_tokens = 0
-    root = ET.parse('data/Persian.xml').getroot()
-    file_path = "{http://www.mediawiki.org/xml/export-0.10/}"
-    persian_ids = [id_tag.text for id_tag in root.iter(file_path + 'id')]
-    i = 1
-    for title_tag in root.iter(file_path + 'title'):
-        title_tokens = prepare_text(text=title_tag.text, lang="fa")
-        number_of_persian_tokens += len(title_tokens)
-        persian_tokens[i] = {
-            "title_token": title_tokens,
-        }
-        for tok in title_tokens:
-            if tok not in persian_token_repetition.keys():
-                persian_token_repetition[tok] = 1
-            else:
-                persian_token_repetition[tok] += 1
-        i += 1
-
-    i = 1
-    for text_tag in root.iter(file_path + 'text'):
-        description_tokens = prepare_text(text=text_tag.text, lang="fa")
-        number_of_persian_tokens += len(description_tokens)
-        persian_tokens[i]["description"] = description_tokens
-        for tok in description_tokens:
-            if tok not in persian_token_repetition.keys():
-                persian_token_repetition[tok] = 1
-            else:
-                persian_token_repetition[tok] += 1
-        i += 1
-
-    # print persian_tokens[ 0 : 10 ]
-    j = 0
-    for i in persian_tokens.keys():
-        # print("## ", i)
-        # print(persian_tokens[i])
-        # print("--------------------------------------------------------------------------")
-        if j == 10:
-            break
-        j += 1
-
-    z = 0.0025
-    # print([t for t in persian_token_repetition.keys() if persian_token_repetition[t] > z * number_of_persian_tokens])
-    print(persian_tokens[5])
-    return english_tokens,token_repetition,persian_tokens,persian_token_repetition
-
-    # z = 0.0025
-    # ['اس', 'کرد', 'تاریخ', 'ایر', 'دو', 'رده', 'شهر', 'کشور', 'نا',
-    # 'میلاد', 'یک', 'سال', 'نیز', 'بود', 'شد', 'خود', 'برا']
-
-    # z = 0.0015
-    # ['از', 'اس', 'که', 'نا', 'آن', 'بر', 'و', 'به', 'کرد'
-    # , '==', 'رده', 'ایر', 'یک', '<ref',
-    # 'name=', '«', '»', 'یادکرد', '//www', '</ref>', 'شهر', 'این', 'در',
-    # 'دارد', 'کشور', 'سال', 'http', '===', 'با', 'دو', 'زب', 'را', 'نیز', 'بود', 'شد', 'بزرگ', 'تاریخ', 'خود', 'شده'
-    # , 'میلاد', 'تا', 'دیگر', 'برا', 'ه', 'یا', 'او', 'پرونده', 'ب', 'عنو', '|-', 'of', '–', '<ref>', 'آمریکا', '||']
-
-
-
+        return persian_tokens, persian_token_repetition
