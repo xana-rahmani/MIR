@@ -26,7 +26,7 @@ def prepare_text(text, lang="en"):
         normalizer = Normalizer()
         punctuations = [']]', '[[', '[', ']', '؟', '!', '.', ',', '،', '?', ')', '(', ')', '(', '\n', '=','==', '===', '«',
                         '»',
-                        '//www', 'http', '</ref>', '||', '<ref', '<ref>', 'name=', '|-', 'of', '–','|','-']
+                        '//www', 'http', '</ref>', '||', '<ref', '<ref>', 'name=', '|-', 'of', '–','|','-','\'','"']
         for punc in punctuations:
             text = text.replace(punc,' ')
         text = normalizer.normalize(text)
