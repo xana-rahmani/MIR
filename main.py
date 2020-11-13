@@ -40,6 +40,17 @@ def prepare_text(text, lang="en"):
             tok = Stemmer().stem(tok)
             if tok in (Persian_stop_words_level1 + Persian_stop_words_level2):
                 continue
+
+            is_not_persian = True
+            for c in tok:
+                if '\u061F' <= c <= '\u065f':
+                    is_not_persian = False
+                    break
+                if '\u066B' <= c <= '\u06dc':
+                    is_not_persian = False
+                    break
+            if is_not_persian:
+                continue
             tokens.append(tok)
 
     return tokens
