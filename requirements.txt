@@ -1,0 +1,8 @@
+click==7.1.2
+hazm==0.7.0
+joblib==0.17.0
+libwapiti==0.2.1
+nltk==3.5
+regex==2020.11.13
+six==1.15.0
+tqdm==4.51.0

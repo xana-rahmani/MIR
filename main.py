@@ -24,9 +24,10 @@ def prepare_text(text, lang="en"):
         tokens = [tok for tok in tokens if tok not in English_stop_words_level1 + English_stop_words_level2]
     elif lang == "fa":
         normalizer = Normalizer()
-        punctuations = [']]', '[[', '[', ']', '؟', '!', '.', ',', '،', '?', ')', '(', ')', '(', '\n', '=','==', '===', '«',
-                        '»',
-                        '//www', 'http', '</ref>', '||', '<ref', '<ref>', 'name=', '|-', 'of', '–','|','-','\'','"']
+        punctuations = [']]', '[[', '[', ']', '؟', '!', '.', ',', '،', '?', ')', '(', ')', '(', '=', '==', '===',
+                        '«', '»', '//www', 'http', '</ref>', '||', '<ref', '<ref>', 'name=', '|-', 'of', '–', '/'
+                        '|', '-', '♦️', '♠️', '≈', '&', '←', '†', '‘', '—', '★', '≥',  '\n', '\'', '"', '\\', '//',
+                        '</sup>', '<sup>', '<math>', '<math>', '*', '+', '<', '>', ';', '_', '$']
         for punc in punctuations:
             text = text.replace(punc,' ')
         text = normalizer.normalize(text)
