@@ -48,7 +48,7 @@ def Create_Inverted_Index(lang='en', output_path='out.txt'):
         INVERTED_INDEX[tokens_of_dic[i]['token']] = [tokens_of_dic[i]['posting']]
         current_token = i
         while i + 1 < len(tokens_of_dic) and tokens_of_dic[i + 1]['token'] == tokens_of_dic[current_token]['token']:
-            INVERTED_INDEX[tokens_of_dic[current_token]['token']].append([tokens_of_dic[i + 1]['posting']])
+            INVERTED_INDEX[tokens_of_dic[current_token]['token']].append(tokens_of_dic[i + 1]['posting'])
             i += 1
         i += 1
     Write_And_Clear__Invert_Index(output_path)
