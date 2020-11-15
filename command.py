@@ -1,7 +1,8 @@
 import csv
 import xml.etree.ElementTree as Et
 from First_part import prepare_text
-from Second_part import Create_Inverted_Index, Create_Bigrame, FA_Tokens, FA_Token_Repetition, EN_Tokens, EN_Token_Repetition
+from Second_part import Create_Inverted_Index, Create_Bigrame, FA_Tokens, FA_Token_Repetition, EN_Tokens, \
+    EN_Token_Repetition
 from Forth_part import Spell_Checker
 
 

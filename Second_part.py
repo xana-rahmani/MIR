@@ -55,14 +55,12 @@ def Create_Inverted_Index(lang='en', output_path='out.txt'):
 
 
 def Write_And_Clear__Invert_Index(output_path):
-    i = 0
     new_inverted_index = {}
     for keys in INVERTED_INDEX.keys():
         posting_list = INVERTED_INDEX[keys]
         new_posting_list = []
         for doc in posting_list:
             new_doc = []
-            print(i, doc)
             new_doc.append(doc['doc_ID'])
             part = doc['part']
             if part == 't':
@@ -80,10 +78,10 @@ def Write_And_Clear__Invert_Index(output_path):
                 new_doc.append(doc['description_positions'])
                 new_doc.append(doc['description_repetitions'])
             new_posting_list.append(new_doc)
-            i += 1
         new_inverted_index[keys] = new_posting_list
     with open(output_path, 'w', encoding='utf-8') as f:
-        f.write(json.dumps(INVERTED_INDEX, ensure_ascii=False))
+        f.write(json.dumps(new_inverted_index, ensure_ascii=False))
+    new_inverted_index.clear()
     INVERTED_INDEX.clear()
 
 
@@ -96,7 +94,7 @@ def Load__Invert_Index_File(load_file_path):
             loaded_index = json.loads(data)
             index = {}  # we want to return the index with postings that are dictionaries
             for key in loaded_index.keys():
-                loaded_docs = index[key]
+                loaded_docs = loaded_index[key]
                 new_docs = []
                 for doc in loaded_docs:
                     new_posting = {
@@ -120,7 +118,7 @@ def Load__Invert_Index_File(load_file_path):
                 index[key] = new_docs
             return index
     except Exception as e:
-        print("#Erorr in Load Invert Index File", e)
+        print("#Erorr in Load Invert Index File: ", e)
         return None
 
 
