@@ -64,6 +64,33 @@ def Merge_Index_Posting(dic, load_file_path):
 
 
 def Write_And_Clear__Invert_Index(output_path):
+    New_INVERTED_INDEX = {}
+    for keys in INVERTED_INDEX.keys():
+        posting_list = INVERTED_INDEX[keys]
+        new_posting_list = []
+        for doc in posting_list:
+            new_doc = []
+            new_doc.append(doc['doc_ID'])
+            part = doc['part']
+            if part == 't':
+                new_doc.append(0)
+                new_doc.append(doc['title_positions'])
+                new_doc.append(doc['title_repetitions'])
+            elif part == 'd':
+                new_doc.append(1)
+                new_doc.append(doc['description_positions'])
+                new_doc.append(doc['description_repetitions'])
+            else:
+                new_doc.append(2)
+                new_doc.append(doc['title_positions'])
+                new_doc.append(doc['title_repetitions'])
+                new_doc.append(doc['description_positions'])
+                new_doc.append(doc['description_repetitions'])
+            new_posting_list.append(new_doc)
+        New_INVERTED_INDEX[keys] = new_posting_list
+
+
+
     with open(output_path, 'w', encoding='utf-8') as f:
         f.write(json.dumps(INVERTED_INDEX, ensure_ascii=False))
     INVERTED_INDEX.clear()
@@ -75,7 +102,33 @@ def Load__Invert_Index_File(load_file_path):
             data = file.read()
             if len(data) == 0:
                 return None
-            index = json.loads(data)
+            loaded_index = json.loads(data)
+            index = {} # we want to return the index with postings that are dictionaries
+            for key in loaded_index.keys():
+                loaded_docs = index[key]
+                new_docs = []
+                for doc in loaded_docs:
+                    new_posting = {}
+                    new_posting['doc_ID'] = doc[0]
+                    if doc[1] == 0:
+                        new_posting['part'] = 't'
+                        new_posting['title_positions'] = doc[2]
+                        new_posting['title_repetitions'] = doc[3]
+                    elif doc[1] == 1:
+                        new_posting['part'] = 'd'
+                        new_posting['description_positions'] = doc[2]
+                        new_posting['description_repetitions'] = doc[3]
+                    elif doc[1] == 2:
+                        new_posting['part'] = 'b'
+                        new_posting['title_positions'] = doc[2]
+                        new_posting['title_repetitions'] = doc[3]
+                        new_posting['description_positions'] = doc[4]
+                        new_posting['description_repetitions'] = doc[5]
+                    new_docs.append(new_posting)
+                index[key] = new_docs
+
+
+
             return index
     except Exception as e:
         print(10)
@@ -117,3 +170,5 @@ def AddDoc():
 
 def RemoveDoc():
     pass
+
+Create_Inverted_Index()
