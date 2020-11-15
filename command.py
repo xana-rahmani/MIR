@@ -1,7 +1,8 @@
 import csv
 import xml.etree.ElementTree as Et
 from First_part import prepare_text
-from Second_part import Create_Inverted_Index, FA_Tokens, FA_Token_Repetition, EN_Tokens, EN_Token_Repetition
+from Second_part import Create_Inverted_Index, Create_Bigrame, FA_Tokens, FA_Token_Repetition, EN_Tokens, EN_Token_Repetition
+from Forth_part import Spell_Checker
 
 
 def Read_And_AddDocsFile(path, lang="en"):
@@ -82,3 +83,17 @@ while True:
         lang = command[1]
         output_path = command[2]
         Create_Inverted_Index(lang, output_path)
+    if command[0] == "create-bigrame":
+        # create-bigrame en en_bigrame.txt
+        # create-bigrame fa fa_bigrame.txt
+        lang = command[1]
+        output_path = command[2]
+        Create_Bigrame(lang, output_path)
+    if command[0] == "spell_checker":
+        # spell_checker en_bigrame.txt Spidir
+        bigram_path = command[1]
+        words_not_found = []
+        for w in command[2:]:
+            words_not_found.append(w)
+        temp = Spell_Checker(words_not_found, bigram_path)
+        print(temp)
