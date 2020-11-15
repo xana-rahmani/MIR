@@ -9,7 +9,7 @@ Bigram_Index = {}
 
 
 def Create_Inverted_Index(lang='en', output_path='out.txt'):
-    tokens_of_dictionary = []
+    tokens_of_dic = []
     if lang == 'en':
         tokens = EN_Tokens
     else:
@@ -40,36 +40,29 @@ def Create_Inverted_Index(lang='en', output_path='out.txt'):
                         posting['description_positions'].append(i)
                         posting['description_repetitions'] += 1
 
-            tokens_of_dictionary.append({'token': token, 'posting': posting, 'doc_id': doc_id})
+            tokens_of_dic.append({'token': token, 'posting': posting, 'doc_id': doc_id})
             # the doc id is also in the 'posting'. but i also added it here to use it in the next line for sorting
-    tokens_of_dictionary = sorted(tokens_of_dictionary, key=lambda k: (k['token'], k['doc_id']))
-
-    Merge_Index_Posting(tokens_of_dictionary, load_file_path=output_path)
+    tokens_of_dic = sorted(tokens_of_dic, key=lambda k: (k['token'], k['doc_id']))
+    i = 0
+    while i < len(tokens_of_dic):
+        INVERTED_INDEX[tokens_of_dic[i]['token']] = [tokens_of_dic[i]['posting']]
+        current_token = i
+        while i + 1 < len(tokens_of_dic) and tokens_of_dic[i + 1]['token'] == tokens_of_dic[current_token]['token']:
+            INVERTED_INDEX[tokens_of_dic[current_token]['token']].append([tokens_of_dic[i + 1]['posting']])
+            i += 1
+        i += 1
     Write_And_Clear__Invert_Index(output_path)
 
 
-def Merge_Index_Posting(dic, load_file_path):
-    load_dic = Load__Invert_Index_File(load_file_path)
-    if load_dic is None:
-        i = 0
-        while i < len(dic):
-            INVERTED_INDEX[dic[i]['token']] = [dic[i]['posting']]
-            current_token = i
-            while i + 1 < len(dic) and dic[i + 1]['token'] == dic[current_token]['token']:
-                INVERTED_INDEX[dic[current_token]['token']].append([dic[i + 1]['posting']])
-                i += 1
-            i += 1
-    else:
-        print("To DO")  # TODO
-
-
 def Write_And_Clear__Invert_Index(output_path):
-    New_INVERTED_INDEX = {}
+    i = 0
+    new_inverted_index = {}
     for keys in INVERTED_INDEX.keys():
         posting_list = INVERTED_INDEX[keys]
         new_posting_list = []
         for doc in posting_list:
             new_doc = []
+            print(i, doc)
             new_doc.append(doc['doc_ID'])
             part = doc['part']
             if part == 't':
@@ -87,10 +80,8 @@ def Write_And_Clear__Invert_Index(output_path):
                 new_doc.append(doc['description_positions'])
                 new_doc.append(doc['description_repetitions'])
             new_posting_list.append(new_doc)
-        New_INVERTED_INDEX[keys] = new_posting_list
-
-
-
+            i += 1
+        new_inverted_index[keys] = new_posting_list
     with open(output_path, 'w', encoding='utf-8') as f:
         f.write(json.dumps(INVERTED_INDEX, ensure_ascii=False))
     INVERTED_INDEX.clear()
@@ -103,13 +94,14 @@ def Load__Invert_Index_File(load_file_path):
             if len(data) == 0:
                 return None
             loaded_index = json.loads(data)
-            index = {} # we want to return the index with postings that are dictionaries
+            index = {}  # we want to return the index with postings that are dictionaries
             for key in loaded_index.keys():
                 loaded_docs = index[key]
                 new_docs = []
                 for doc in loaded_docs:
-                    new_posting = {}
-                    new_posting['doc_ID'] = doc[0]
+                    new_posting = {
+                        'doc_ID': doc[0],
+                    }
                     if doc[1] == 0:
                         new_posting['part'] = 't'
                         new_posting['title_positions'] = doc[2]
@@ -126,12 +118,9 @@ def Load__Invert_Index_File(load_file_path):
                         new_posting['description_repetitions'] = doc[5]
                     new_docs.append(new_posting)
                 index[key] = new_docs
-
-
-
             return index
     except Exception as e:
-        print(10)
+        print("#Erorr in Load Invert Index File", e)
         return None
 
 
@@ -170,5 +159,3 @@ def AddDoc():
 
 def RemoveDoc():
     pass
-
-Create_Inverted_Index()
