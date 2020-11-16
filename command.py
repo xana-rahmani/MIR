@@ -1,9 +1,10 @@
 import csv
 import xml.etree.ElementTree as Et
-from First_part import prepare_text
-from Second_part import Create_Inverted_Index, Create_Bigrame, FA_Tokens, FA_Token_Repetition, EN_Tokens, \
+from first_part import prepare_text
+from second_part import Create_Inverted_Index, Create_Bigrame, FA_Tokens, FA_Token_Repetition, EN_Tokens, \
     EN_Token_Repetition, RemoveDoc
-from Forth_part import Spell_Checker
+from third_part import compress_file, decompress_file
+from fourth_part import Spell_Checker
 
 
 def Read_And_AddDocsFile(path, lang="en"):
@@ -93,7 +94,23 @@ while True:
             lang = command[1]
             output_path = command[2]
             Create_Bigrame(lang, output_path)
-        if command[0] == "spell_checker":
+        if command[0] == "compress":
+            # compress en_inverted.txt gamma
+            # compress en_inverted.txt variableByte
+            # compress fa_inverted.txt gamma
+            # compress fa_inverted.txt variableByte
+            fileName = command[1]
+            coding = command[2]
+            compress_file(fileName, coding)
+        if command[0] == "decompress":
+            # decompress en_inverted.txt gamma
+            # decompress en_inverted.txt variableByte
+            # decompress fa_inverted.txt gamma
+            # decompress fa_inverted.txt variableByte
+            fileName = command[1]
+            coding = command[2]
+            data = decompress_file(fileName, coding)
+        if command[0] == "spell-checker":
             # spell_checker en_bigrame.txt Spidir
             bigram_path = command[1]
             words_not_found = []
