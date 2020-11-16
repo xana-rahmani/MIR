@@ -4,7 +4,7 @@ import math
 import vbcode
 import json
 import functools as ft
-import objsize
+
 
 def gamma_encoding(postings): 
     gapList = get_gaps_list(postings)

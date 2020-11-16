@@ -2,7 +2,7 @@ import csv
 import xml.etree.ElementTree as Et
 from first_part import prepare_text
 from second_part import Create_Inverted_Index, Create_Bigrame, FA_Tokens, FA_Token_Repetition, EN_Tokens, \
-    EN_Token_Repetition, RemoveDoc
+    EN_Token_Repetition, RemoveDoc, AddDoc
 from third_part import compress_file, decompress_file
 from fourth_part import Spell_Checker
 
@@ -126,5 +126,13 @@ while True:
             inverted_file_path = command[3]
             bigrame_file_path = command[4]
             RemoveDoc(int(doc_id), lang, inverted_file_path, bigrame_file_path)
+        if command[0] == "add-doc":
+            print("\t enter doc language\n\t := ", end="")
+            lang = input()
+            print("\t enter doc title\n\t := ", end="")
+            title = input()
+            print("\t enter doc text\n\t := ", end="")
+            text = input()
+            AddDoc(lang=lang,  title=title, text=text)
     except Exception as e:
         print("#Error: ", e)

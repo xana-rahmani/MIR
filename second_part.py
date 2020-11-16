@@ -1,4 +1,6 @@
 import json
+from first_part import prepare_text
+
 EN_Tokens = {}
 FA_Tokens = {}
 EN_Token_Repetition = {}
@@ -268,3 +270,77 @@ def Load__bigrame_Index_File(load_file_path):
 def Write_Update_Bigrame_Index(bigram_index, output_path):
     with open(output_path, 'w', encoding='utf-8') as f:
         f.write(json.dumps(bigram_index, ensure_ascii=False))
+
+
+def AddDoc(lang, title, text):
+    title_tokens = prepare_text(title, lang)
+    description_tokens = prepare_text(text, lang)
+    Tokens = {}
+    Token_Repetition = {}
+    if lang == "en":
+        Tokens = EN_Tokens
+        Token_Repetition = EN_Token_Repetition
+        path = "en_inverted.txt"
+    elif lang == "fa":
+        Tokens = FA_Tokens
+        Token_Repetition = FA_Token_Repetition
+        path = "fa_inverted.txt"
+
+    temp_inverted_index = Load__Invert_Index_File(path)
+    """ Find DOC ID """
+    doc_id = list(Tokens.keys())[-1] + 1
+
+    """ Add Tokens in dic """
+    Tokens[doc_id] = {
+        "title_token": title_tokens,
+        "description": description_tokens
+    }
+
+    """ update Tokens Repetition """
+    for tok in title_tokens + description_tokens:
+        if tok not in Tokens.keys():
+            Token_Repetition[tok] = 1
+        else:
+            Token_Repetition[tok] += 1
+
+    """ Add Tokens in inverted index """
+    if temp_inverted_index is None or not bool(temp_inverted_index) or Tokens is None:
+        return
+    for token in set(title_tokens + description_tokens):
+        add_posting = {
+            "doc_ID": doc_id
+        }
+        if token in title_tokens:
+            add_posting["part"] = "t"
+            add_posting['title_positions'] = []
+            add_posting['title_repetitions'] = 0
+            for i in range(len(title_tokens)):
+                if title_tokens[i] == token:
+                    add_posting['title_positions'].append(i)
+                    add_posting['title_repetitions'] += 1
+        if token in description_tokens:
+            if add_posting.get('part') == 't':
+                add_posting['part'] = 'b'
+            else:
+                add_posting['part'] = 'd'
+            add_posting['description_positions'] = []
+            add_posting['description_repetitions'] = 0
+            for i in range(len(description_tokens)):
+                if description_tokens[i] == token:
+                    add_posting['description_positions'].append(i)
+                    add_posting['description_repetitions'] += 1
+        Posting = temp_inverted_index.get(token)
+        if Posting is not None:
+            newPosting = []
+            for i in range(len(Posting)):
+                if Posting[i].get("doc_ID") < add_posting.get("doc_ID"):
+                    newPosting.append(Posting[i])
+                else:
+                    newPosting.append(add_posting)
+                    newPosting.append(Posting[i:])
+                    break
+            temp_inverted_index[token] = newPosting
+        else:
+            temp_inverted_index[token] = [add_posting]
+    Write_Update_Invert_Index(temp_inverted_index, path)
+    temp_inverted_index.clear()
