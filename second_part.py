@@ -153,6 +153,12 @@ def Write_And_Clear__Bigram_Index(output_path):
     Bigram_Index.clear()
 
 
+def Write_New_Bigram_Index(bigram_index, output_path):
+    with open(output_path, 'w', encoding='utf-8') as f:
+        f.write(json.dumps(bigram_index, ensure_ascii=False))
+    bigram_index.clear()
+
+
 def AddDoc():
     pass
 
@@ -280,13 +286,14 @@ def AddDoc(lang, title, text):
     if lang == "en":
         Tokens = EN_Tokens
         Token_Repetition = EN_Token_Repetition
-        path = "en_inverted.txt"
+        inverted_path = "en_inverted.txt"
+        bigrame_path = "en_bigrame.txt"
     elif lang == "fa":
         Tokens = FA_Tokens
         Token_Repetition = FA_Token_Repetition
-        path = "fa_inverted.txt"
+        inverted_path = "fa_inverted.txt"
+        bigrame_path = "fa_bigrame.txt"
 
-    temp_inverted_index = Load__Invert_Index_File(path)
     """ Find DOC ID """
     doc_id = list(Tokens.keys())[-1] + 1
 
@@ -304,6 +311,7 @@ def AddDoc(lang, title, text):
             Token_Repetition[tok] += 1
 
     """ Add Tokens in inverted index """
+    temp_inverted_index = Load__Invert_Index_File(inverted_path)
     if temp_inverted_index is None or not bool(temp_inverted_index) or Tokens is None:
         return
     for token in set(title_tokens + description_tokens):
@@ -342,5 +350,24 @@ def AddDoc(lang, title, text):
             temp_inverted_index[token] = newPosting
         else:
             temp_inverted_index[token] = [add_posting]
-    Write_Update_Invert_Index(temp_inverted_index, path)
+    Write_Update_Invert_Index(temp_inverted_index, inverted_path)
     temp_inverted_index.clear()
+
+    """ Add Tokens in bigram index """
+    temp_bigrame_index = Load__bigrame_Index_File(bigrame_path)
+    if temp_bigrame_index is None or not bool(temp_bigrame_index):
+        return
+    all_tokens = list(title_tokens + description_tokens)
+    all_tokens.sort()
+    for token in all_tokens:
+        t = "$" + token + "$"
+        for i in range(0, len(t) - 1):
+            bigrame = t[i:i + 2]
+            if bigrame in temp_bigrame_index.keys():
+                if token in temp_bigrame_index[bigrame]:
+                    continue
+                temp_bigrame_index[bigrame].append(token)
+            else:
+                temp_bigrame_index[bigrame] = [token]
+    Write_New_Bigram_Index(temp_bigrame_index, bigrame_path)
+    temp_bigrame_index.clear()
