@@ -174,7 +174,7 @@ def RemoveDoc(doc_id, lang, inverted_file_path, bigrame_file_path):
     """ Remove from invert index"""
     token_is_removed = []
     temp_invert_index = Load__Invert_Index_File(inverted_file_path)
-    if temp_invert_index is not None and not bool(temp_invert_index):
+    if temp_invert_index is not None and bool(temp_invert_index):
         for token in set(title_token):
             posting = temp_invert_index.get(token)
             new_posting = []
@@ -206,7 +206,7 @@ def RemoveDoc(doc_id, lang, inverted_file_path, bigrame_file_path):
 
     """ Remove from bigrame index"""
     temp_bigram_index = Load__bigrame_Index_File(bigrame_file_path)
-    if temp_bigram_index is not None and not bool(temp_bigram_index):
+    if temp_bigram_index is not None and bool(temp_bigram_index):
         for token in token_is_removed:
             t = "$" + token + "$"
             for i in range(0, len(t) - 1):
