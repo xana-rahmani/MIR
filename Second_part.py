@@ -163,8 +163,10 @@ def RemoveDoc(doc_id, inverted_file_path, bigrame_file_path):
     description_token = doc_tokens.get("description")
 
     """ Remove from invert index"""
+    token_is_removed = []
     temp_invert_index = Load__Invert_Index_File(inverted_file_path)
-    for token in title_token:
+    print("title_token: ", set(title_token))
+    for token in set(title_token):
         posting = temp_invert_index.get(token)
         new_posting = []
         for p in posting:
@@ -175,8 +177,10 @@ def RemoveDoc(doc_id, inverted_file_path, bigrame_file_path):
         if len(new_posting) != 0:
             temp_invert_index[token] = new_posting
         else:
+            token_is_removed.append(token)
             temp_invert_index.pop(token)
-    for token in description_token:
+    print("title_token: ", set(description_token))
+    for token in set(description_token):
         posting = temp_invert_index.get(token)
         new_posting = []
         for p in posting:
@@ -187,8 +191,29 @@ def RemoveDoc(doc_id, inverted_file_path, bigrame_file_path):
         if len(new_posting) != 0:
             temp_invert_index[token] = new_posting
         else:
+            token_is_removed.append(token)
             temp_invert_index.pop(token)
     Write_Update_Invert_Index(temp_invert_index, inverted_file_path)
+    temp_invert_index.clear()
+
+    """ Remove from bigrame index"""
+    print("token_is_removed: ", token_is_removed)
+    temp_bigram_index = Load__bigrame_Index_File(bigrame_file_path)
+    for token in token_is_removed:
+        t = "$" + token + "$"
+        for i in range(0, len(t) - 1):
+            bigrame = t[i:i + 2]
+            bigrame_list = temp_bigram_index.get(bigrame)
+            new_bigrame_list = []
+            for i in bigrame_list:
+                if i != token:
+                    new_bigrame_list.append(i)
+            if len(new_bigrame_list) != 0:
+                temp_bigram_index[bigrame] = new_bigrame_list
+            else:
+                temp_bigram_index.pop(bigrame)
+    Write_Update_Bigrame_Index(temp_bigram_index, bigrame_file_path)
+    temp_bigram_index.clear()
 
 
 def Write_Update_Invert_Index(inverted_index, output_path):
@@ -220,3 +245,17 @@ def Write_Update_Invert_Index(inverted_index, output_path):
         f.write(json.dumps(new_inverted_index, ensure_ascii=False))
     new_inverted_index.clear()
     inverted_index.clear()
+
+
+def Load__bigrame_Index_File(load_file_path):
+    with open(load_file_path, 'r') as file:
+        data = file.read()
+        if len(data) == 0:
+            return None
+        loaded_index = json.loads(data)
+        return loaded_index
+
+
+def Write_Update_Bigrame_Index(bigram_index, output_path):
+    with open(output_path, 'w', encoding='utf-8') as f:
+        f.write(json.dumps(bigram_index, ensure_ascii=False))

@@ -83,7 +83,7 @@ while True:
             Read_And_AddDocsFile(path, lang)
         if command[0] == "create-invert-index":
             # create-invert-index en en_inverted.txt
-            # create-invert-index fa fa.txt
+            # create-invert-index fa fa_inverted.txt
             lang = command[1]
             output_path = command[2]
             Create_Inverted_Index(lang, output_path)
@@ -103,6 +103,7 @@ while True:
             print(temp)
         if command[0] == "remove-doc":
             # remove-doc 1878 en_inverted.txt en_bigrame.txt
+            # remove-doc 146 fa_inverted.txt fa_bigrame.txt
             doc_id = command[1]
             inverted_file_path = command[2]
             bigrame_file_path = command[3]
