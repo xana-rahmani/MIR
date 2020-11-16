@@ -1,11 +1,15 @@
 import sys
+import os
+import math
 import vbcode
 import json
 import functools as ft
 import objsize
 
 def gamma_encoding(postings): 
-    res =  ''.join([get_length(get_offset(gap))+get_offset(gap) for gap in get_gaps_list(postings)])
+    gapList = get_gaps_list(postings)
+    gapList[0] += 2 # to adapt 0,1 in gamma encoding
+    res =  ''.join([get_length(get_offset(gap))+get_offset(gap) for gap in gapList])
     return int(res, 2)
 
 def gamma_decoding(gamma):
@@ -19,6 +23,7 @@ def gamma_decoding(gamma):
             offset = "1"+gamma[aux+1:aux+1+int(unary_decodification(length))]
             res.append(int(offset,2))
             gamma  = gamma[aux+1+int(unary_decodification(length)):]
+    res[0] -= 2 # to revert the adaptaion of 0,1
     for i in range(1, len(res)):
         res[i] += res[i-1]
     return res
@@ -41,67 +46,71 @@ def unary_decodification(gap): return ft.reduce(lambda x,y : int(x)+int(y),list(
 
 def get_gaps_list(posting_lists): return [posting_lists[0]]+[posting_lists[i]-posting_lists[i-1] for i in range(1,len(posting_lists))]
 
-def compress_file(fileName, mode):
+def compress_file(fileName, coding):
+    # determine mode function
+    if coding == 'gamma':
+        mode = gamma_encoding
+    elif coding == 'variableByte':
+        mode = variable_encoding
+    else:
+        return
     # read uncompressed data from file
-    with open(fileName + '.txt', 'r', encoding='utf-8') as f:
+    with open(fileName, 'r', encoding='utf-8') as f:
         data = json.loads(f.read()) # data is now a dict
     # compression
     for word, postingList in data.items():
         for i in range(len(postingList)):
-            if postingList[i]['part'] == 'd':
-                data[word][i]['description_positions'] = mode(postingList[i]['description_positions'])
-            elif postingList[i]['part'] == 't':
-                data[word][i]['title_positions'] = mode(postingList[i]['title_positions'])
-            elif postingList[i]['part'] == 'b':
-                data[word][i]['description_positions'] = mode(postingList[i]['description_positions'])
-                data[word][i]['title_positions'] = mode(postingList[i]['title_positions'])
+            if postingList[i][1] == 1:
+                data[word][i][2] = mode(postingList[i][2])
+            elif postingList[i][1] == 0:
+                data[word][i][2] = mode(postingList[i][2])
+            elif postingList[i][1] == 2:
+                data[word][i][4] = mode(postingList[i][4])
+                data[word][i][2] = mode(postingList[i][2])
     # write to file
-    if mode == gamma_encoding:
-        coding = 'gamma'
-    else:
-        coding = 'variableByte'
-    with open(fileName + '_' + coding + 'Compressed.txt', 'w', encoding='utf-8') as f:
+    compressedFileName = fileName[:-4] + '_' + coding + 'Compressed.txt'
+    with open(compressedFileName, 'w', encoding='utf-8') as f:
         f.write(json.dumps(data))
+    # get the uncompressed file size in KB
+    unComp = math.ceil(os.stat(fileName).st_size/1024)
+    comp = math.ceil(os.stat(compressedFileName).st_size/1024)
+    print(fileName + ' size before ' + coding + ' compression:', unComp ,'KB')
+    print(fileName + ' size after  ' + coding + ' compression:', comp ,'KB')
 
-def decompress_file(fileName, mode):
-    # read compressed data from file
-    if mode == gamma_decoding:
-        coding = 'gamma'
+def decompress_file(fileName, coding):
+    # determine mode function
+    if coding == 'gamma':
+        mode = gamma_decoding
+    elif coding == 'variableByte':
+        mode = variable_decoding
     else:
-        coding = 'variableByte'
-    with open(fileName + '_' + coding + 'Compressed.txt', 'r', encoding='utf-8') as f:
+        return
+    # read compressed data from file
+    compressedFileName = fileName[:-4] + '_' + coding + 'Compressed.txt'
+    with open(compressedFileName, 'r', encoding='utf-8') as f:
         data = json.loads(f.read()) # data is now a dict
     # decompression
     for word, postingList in data.items():
         for i in range(len(postingList)):
-            if postingList[i]['part'] == 'd':
-                data[word][i]['description_positions'] = mode(postingList[i]['description_positions'])
-            elif postingList[i]['part'] == 't':
-                data[word][i]['title_positions'] = mode(postingList[i]['title_positions'])
-            elif postingList[i]['part'] == 'b':
-                data[word][i]['description_positions'] = mode(postingList[i]['description_positions'])
-                data[word][i]['title_positions'] = mode(postingList[i]['title_positions'])
+            if postingList[i][1] == 1:
+                data[word][i][2] = mode(postingList[i][2])
+            elif postingList[i][1] == 0:
+                data[word][i][2] = mode(postingList[i][2])
+            elif postingList[i][1] == 2:
+                data[word][i][4] = mode(postingList[i][4])
+                data[word][i][2] = mode(postingList[i][2])
     return data
 
-lang = 'en'
-# lang = 'fa'
-if lang == 'en':
-    fileName = 'english_index'
-elif lang == 'fa':
-    fileName = 'persian_index'
-# read uncompressed data from file
-with open(fileName + '.txt', 'r', encoding='utf-8') as f:
-    data = json.loads(f.read()) # data is now a dict
-print('data size before compression:', type(data), objsize.get_deep_size(data))
-# compression using gamma encoding
-compress_file(fileName, gamma_encoding)
-print('data size after gamma encoding compression:', type(data), objsize.get_deep_size(data))
-# compression using variable byte encoding
-compress_file(fileName, variable_encoding)
-print('data size after variable byte encoding compression:', type(data), objsize.get_deep_size(data))
-# decompression using gamma encoding
-data_gamma = decompress_file(fileName, gamma_decoding)
-print('data size after gamma encoding decompression:', type(data_gamma), objsize.get_deep_size(data_gamma))
-# decompression using variable byte encoding
-data_variableByte = decompress_file(fileName, variable_decoding)
-print('data size after variable byte encoding decompression:', type(data_variableByte), objsize.get_deep_size(data_variableByte))
+# lang = 'en'
+# fileName = lang + '_inverted.txt'
+# # read uncompressed data from file
+# with open(fileName, 'r', encoding='utf-8') as f:
+#     data = json.loads(f.read()) # data is now a dict
+# # compression
+# compress_file(fileName, 'gamma')
+# compress_file(fileName, 'variableByte')
+# # decompression
+# data_gamma = decompress_file(fileName, 'gamma')
+# data_variableByte = decompress_file(fileName, 'variableByte')
+# # print(data == data_gamma)
+# # print(data == data_variableByte)
