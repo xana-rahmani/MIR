@@ -158,15 +158,16 @@ def AddDoc():
 def RemoveDoc(doc_id, lang, inverted_file_path, bigrame_file_path):
 
     """ get doc tokens """
-    doc_tokens = {}
+    Tokens = {}
     token_repetition = {}
     if lang == "en":
-        doc_tokens = EN_Tokens.get(doc_id)
+        Tokens = EN_Tokens
         token_repetition = EN_Token_Repetition
     elif lang == "fa":
-        doc_tokens = FA_Tokens.get(doc_id)
+        Tokens = FA_Tokens
         token_repetition = FA_Token_Repetition
 
+    doc_tokens = Tokens.get(doc_id)
     title_token = doc_tokens.get("title_token", [])
     description_token = doc_tokens.get("description", [])
 
@@ -221,6 +222,7 @@ def RemoveDoc(doc_id, lang, inverted_file_path, bigrame_file_path):
                     temp_bigram_index.pop(bigrame)
         Write_Update_Bigrame_Index(temp_bigram_index, bigrame_file_path)
         temp_bigram_index.clear()
+    Tokens.pop(doc_id)
 
 
 def Write_Update_Invert_Index(inverted_index, output_path):
