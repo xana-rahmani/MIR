@@ -155,5 +155,68 @@ def AddDoc():
     pass
 
 
-def RemoveDoc():
-    pass
+def RemoveDoc(doc_id, inverted_file_path, bigrame_file_path):
+
+    """ get doc tokens """
+    doc_tokens = EN_Tokens.get(doc_id)
+    title_token = doc_tokens.get("title_token")
+    description_token = doc_tokens.get("description")
+
+    """ Remove from invert index"""
+    temp_invert_index = Load__Invert_Index_File(inverted_file_path)
+    for token in title_token:
+        posting = temp_invert_index.get(token)
+        new_posting = []
+        for p in posting:
+            if p.get("doc_ID") == doc_id:
+                EN_Token_Repetition[token] = EN_Token_Repetition.get(token) - p.get("title_repetitions")
+            else:
+                new_posting.append(p)
+        if len(new_posting) != 0:
+            temp_invert_index[token] = new_posting
+        else:
+            temp_invert_index.pop(token)
+    for token in description_token:
+        posting = temp_invert_index.get(token)
+        new_posting = []
+        for p in posting:
+            if p.get("doc_ID") == doc_id:
+                EN_Token_Repetition[token] = EN_Token_Repetition.get(token) - p.get("description_repetitions")
+            else:
+                new_posting.append(p)
+        if len(new_posting) != 0:
+            temp_invert_index[token] = new_posting
+        else:
+            temp_invert_index.pop(token)
+    Write_Update_Invert_Index(temp_invert_index, inverted_file_path)
+
+
+def Write_Update_Invert_Index(inverted_index, output_path):
+    new_inverted_index = {}
+    for keys in inverted_index.keys():
+        posting_list = inverted_index[keys]
+        new_posting_list = []
+        for doc in posting_list:
+            new_doc = []
+            new_doc.append(doc['doc_ID'])
+            part = doc['part']
+            if part == 't':
+                new_doc.append(0)
+                new_doc.append(doc['title_positions'])
+                new_doc.append(doc['title_repetitions'])
+            elif part == 'd':
+                new_doc.append(1)
+                new_doc.append(doc['description_positions'])
+                new_doc.append(doc['description_repetitions'])
+            else:
+                new_doc.append(2)
+                new_doc.append(doc['title_positions'])
+                new_doc.append(doc['title_repetitions'])
+                new_doc.append(doc['description_positions'])
+                new_doc.append(doc['description_repetitions'])
+            new_posting_list.append(new_doc)
+        new_inverted_index[keys] = new_posting_list
+    with open(output_path, 'w', encoding='utf-8') as f:
+        f.write(json.dumps(new_inverted_index, ensure_ascii=False))
+    new_inverted_index.clear()
+    inverted_index.clear()

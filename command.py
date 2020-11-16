@@ -2,7 +2,7 @@ import csv
 import xml.etree.ElementTree as Et
 from First_part import prepare_text
 from Second_part import Create_Inverted_Index, Create_Bigrame, FA_Tokens, FA_Token_Repetition, EN_Tokens, \
-    EN_Token_Repetition
+    EN_Token_Repetition, RemoveDoc
 from Forth_part import Spell_Checker
 
 
@@ -58,43 +58,54 @@ print("###################  Commands  ########################\n")
 print("- for load doc's file:")
 print("\tadd-docs-file  input-path  lang")
 print("- for create invert index:")
-print("\tcreate-invert-index lang output-path")
+print("\tcreate-invert-index  lang  output-path")
+print("- for remove doc with id:")
+print("\tremove-doc doc_id  inverted_file_path  bigrame_file_path")
 print("\n#######################################################\n")
 while True:
-    print("$ ", end="")
-    command = input().split()
-    if command is None:
-        continue
-    if command[0] == "prepare-text":
-        # prepare-text en "Hello Modern Information Retrieval"
-        # prepare-text fa "سلام درس بازیابی"
-        lang = command[1]
-        text = " ".join(command[2:])
-        tokens = prepare_text(text, lang)
-        print(tokens)
-    if command[0] == "add-docs-file":
-        # add-docs-file data/ted_talks.csv en
-        # add-docs-file data/Persian.xml fa
-        path = command[1]
-        lang = command[2]
-        Read_And_AddDocsFile(path, lang)
-    if command[0] == "create-invert-index":
-        # create-invert-index en en.txt
-        # create-invert-index fa fa.txt
-        lang = command[1]
-        output_path = command[2]
-        Create_Inverted_Index(lang, output_path)
-    if command[0] == "create-bigrame":
-        # create-bigrame en en_bigrame.txt
-        # create-bigrame fa fa_bigrame.txt
-        lang = command[1]
-        output_path = command[2]
-        Create_Bigrame(lang, output_path)
-    if command[0] == "spell_checker":
-        # spell_checker en_bigrame.txt Spidir
-        bigram_path = command[1]
-        words_not_found = []
-        for w in command[2:]:
-            words_not_found.append(w)
-        temp = Spell_Checker(words_not_found, bigram_path)
-        print(temp)
+    try:
+        print("$ ", end="")
+        command = input().split()
+        if command is None:
+            continue
+        if command[0] == "prepare-text":
+            # prepare-text en "Hello Modern Information Retrieval"
+            # prepare-text fa "سلام درس بازیابی"
+            lang = command[1]
+            text = " ".join(command[2:])
+            tokens = prepare_text(text, lang)
+            print(tokens)
+        if command[0] == "add-docs-file":
+            # add-docs-file data/ted_talks.csv en
+            # add-docs-file data/Persian.xml fa
+            path = command[1]
+            lang = command[2]
+            Read_And_AddDocsFile(path, lang)
+        if command[0] == "create-invert-index":
+            # create-invert-index en en_inverted.txt
+            # create-invert-index fa fa.txt
+            lang = command[1]
+            output_path = command[2]
+            Create_Inverted_Index(lang, output_path)
+        if command[0] == "create-bigrame":
+            # create-bigrame en en_bigrame.txt
+            # create-bigrame fa fa_bigrame.txt
+            lang = command[1]
+            output_path = command[2]
+            Create_Bigrame(lang, output_path)
+        if command[0] == "spell_checker":
+            # spell_checker en_bigrame.txt Spidir
+            bigram_path = command[1]
+            words_not_found = []
+            for w in command[2:]:
+                words_not_found.append(w)
+            temp = Spell_Checker(words_not_found, bigram_path)
+            print(temp)
+        if command[0] == "remove-doc":
+            # remove-doc 1878 en_inverted.txt en_bigrame.txt
+            doc_id = command[1]
+            inverted_file_path = command[2]
+            bigrame_file_path = command[3]
+            RemoveDoc(int(doc_id), inverted_file_path, bigrame_file_path)
+    except Exception as e:
+        print("#Error: ", e)
