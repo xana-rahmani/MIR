@@ -31,8 +31,6 @@ def closest_word_edit_distance(word, candidates):
 def jaccard(word1, word2, length_of_intersection):
     word2 = "$" + word2 + "$"
     return length_of_intersection / (len(word1) - 1 + len(word2) - 1 - length_of_intersection)
-
-
 def closest_words_with_jaccard(word, bigram_index):
     tokens_with_bigram_common_with_word = {}
     word = "$" + word + "$"
