@@ -1,6 +1,5 @@
 import string
 import nltk
-import xml.etree.ElementTree as ET
 from hazm import *
 
 English_stop_words_level1 = ['an', 'and', 'for', 'that', 'the', 'with', 'he', 'in', 'can', 'from', 'a', 'to', 'of',
@@ -25,7 +24,8 @@ def prepare_text(text, lang="en"):
         punctuations = [']]', '[[', '[', ']', '؟', '!', '.', ',', '،', '?', ')', '(', ')', '(', '=', '==', '===', '✔',
                         '«', '»', '//www', 'http', '</ref>', '||', '<ref', '<ref>', 'name=', '|-', 'of', '–', '/', '‹‹',
                         '|', '-', '♦️', '♠️', '≈', '&', '←', '†', '‘', '—', '★', '≥',  '\n', '\'', '"', '\\', '//',
-                        '</sup>', '<sup>', '<math>', '<math>', '*', '+', '<', '>', ';', '_', '$', '#', "ş", "٪", ""]
+                        '</sup>', '<sup>', '<math>', '<math>', '*', '+', '<', '>', ';', '_', '$', '#', "ş", "٪", "",
+                        '\u200d', '`']
         for p in punctuations:
             text = text.replace(p, ' ')
         text = normalizer.normalize(text)

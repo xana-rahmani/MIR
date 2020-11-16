@@ -119,11 +119,12 @@ while True:
             temp = Spell_Checker(words_not_found, bigram_path)
             print(temp)
         if command[0] == "remove-doc":
-            # remove-doc 1878 en_inverted.txt en_bigrame.txt
-            # remove-doc 146 fa_inverted.txt fa_bigrame.txt
+            # remove-doc 1878 en en_inverted.txt en_bigrame.txt
+            # remove-doc 146 fa fa_inverted.txt fa_bigrame.txt
             doc_id = command[1]
-            inverted_file_path = command[2]
-            bigrame_file_path = command[3]
-            RemoveDoc(int(doc_id), inverted_file_path, bigrame_file_path)
+            lang = command[2]
+            inverted_file_path = command[3]
+            bigrame_file_path = command[4]
+            RemoveDoc(int(doc_id), lang, inverted_file_path, bigrame_file_path)
     except Exception as e:
         print("#Error: ", e)

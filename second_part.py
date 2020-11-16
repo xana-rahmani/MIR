@@ -155,65 +155,72 @@ def AddDoc():
     pass
 
 
-def RemoveDoc(doc_id, inverted_file_path, bigrame_file_path):
+def RemoveDoc(doc_id, lang, inverted_file_path, bigrame_file_path):
 
     """ get doc tokens """
-    doc_tokens = EN_Tokens.get(doc_id)
-    title_token = doc_tokens.get("title_token")
-    description_token = doc_tokens.get("description")
+    doc_tokens = {}
+    token_repetition = {}
+    if lang == "en":
+        doc_tokens = EN_Tokens.get(doc_id)
+        token_repetition = EN_Token_Repetition
+    elif lang == "fa":
+        doc_tokens = FA_Tokens.get(doc_id)
+        token_repetition = FA_Token_Repetition
+
+    title_token = doc_tokens.get("title_token", [])
+    description_token = doc_tokens.get("description", [])
 
     """ Remove from invert index"""
     token_is_removed = []
     temp_invert_index = Load__Invert_Index_File(inverted_file_path)
-    print("title_token: ", set(title_token))
-    for token in set(title_token):
-        posting = temp_invert_index.get(token)
-        new_posting = []
-        for p in posting:
-            if p.get("doc_ID") == doc_id:
-                EN_Token_Repetition[token] = EN_Token_Repetition.get(token) - p.get("title_repetitions")
+    if temp_invert_index is not None and not bool(temp_invert_index):
+        for token in set(title_token):
+            posting = temp_invert_index.get(token)
+            new_posting = []
+            for p in posting:
+                if p.get("doc_ID") == doc_id:
+                    token_repetition[token] = token_repetition.get(token) - p.get("title_repetitions")
+                else:
+                    new_posting.append(p)
+            if len(new_posting) != 0:
+                temp_invert_index[token] = new_posting
             else:
-                new_posting.append(p)
-        if len(new_posting) != 0:
-            temp_invert_index[token] = new_posting
-        else:
-            token_is_removed.append(token)
-            temp_invert_index.pop(token)
-    print("title_token: ", set(description_token))
-    for token in set(description_token):
-        posting = temp_invert_index.get(token)
-        new_posting = []
-        for p in posting:
-            if p.get("doc_ID") == doc_id:
-                EN_Token_Repetition[token] = EN_Token_Repetition.get(token) - p.get("description_repetitions")
+                token_is_removed.append(token)
+                temp_invert_index.pop(token)
+        for token in set(description_token):
+            posting = temp_invert_index.get(token)
+            new_posting = []
+            for p in posting:
+                if p.get("doc_ID") == doc_id:
+                    token_repetition[token] = token_repetition.get(token) - p.get("description_repetitions")
+                else:
+                    new_posting.append(p)
+            if len(new_posting) != 0:
+                temp_invert_index[token] = new_posting
             else:
-                new_posting.append(p)
-        if len(new_posting) != 0:
-            temp_invert_index[token] = new_posting
-        else:
-            token_is_removed.append(token)
-            temp_invert_index.pop(token)
-    Write_Update_Invert_Index(temp_invert_index, inverted_file_path)
-    temp_invert_index.clear()
+                token_is_removed.append(token)
+                temp_invert_index.pop(token)
+        Write_Update_Invert_Index(temp_invert_index, inverted_file_path)
+        temp_invert_index.clear()
 
     """ Remove from bigrame index"""
-    print("token_is_removed: ", token_is_removed)
     temp_bigram_index = Load__bigrame_Index_File(bigrame_file_path)
-    for token in token_is_removed:
-        t = "$" + token + "$"
-        for i in range(0, len(t) - 1):
-            bigrame = t[i:i + 2]
-            bigrame_list = temp_bigram_index.get(bigrame)
-            new_bigrame_list = []
-            for i in bigrame_list:
-                if i != token:
-                    new_bigrame_list.append(i)
-            if len(new_bigrame_list) != 0:
-                temp_bigram_index[bigrame] = new_bigrame_list
-            else:
-                temp_bigram_index.pop(bigrame)
-    Write_Update_Bigrame_Index(temp_bigram_index, bigrame_file_path)
-    temp_bigram_index.clear()
+    if temp_bigram_index is not None and not bool(temp_bigram_index):
+        for token in token_is_removed:
+            t = "$" + token + "$"
+            for i in range(0, len(t) - 1):
+                bigrame = t[i:i + 2]
+                bigrame_list = temp_bigram_index.get(bigrame)
+                new_bigrame_list = []
+                for i in bigrame_list:
+                    if i != token:
+                        new_bigrame_list.append(i)
+                if len(new_bigrame_list) != 0:
+                    temp_bigram_index[bigrame] = new_bigrame_list
+                else:
+                    temp_bigram_index.pop(bigrame)
+        Write_Update_Bigrame_Index(temp_bigram_index, bigrame_file_path)
+        temp_bigram_index.clear()
 
 
 def Write_Update_Invert_Index(inverted_index, output_path):
