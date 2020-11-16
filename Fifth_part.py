@@ -16,31 +16,39 @@ def intersect(postingList1,postingList2):
         else:
             p2 += 1
     return answers
-def build_document_vector_from_document_tokens(doc_id,query_tokens,document_tokens,part):
+def build_document_vector_from_document_tokens(doc_id,query_tokens,document_tokens,part,inverted_index):
     #building vector for a document based on inc
     #the final vector only comprises of the tokens in the query
+    N = len(inverted_index)
+    idf = {}
     tf = {}
     all_tokens_in_document = []
+
     if part == 'title':
         all_tokens_in_document = document_tokens[doc_id]['title_tokens']
     elif part == 'description':
         all_tokens_in_document = document_tokens[doc_id]['description_tokens']
     else:
         all_tokens_in_document = document_tokens[doc_id]['title_tokens'] + document_tokens[doc_id]['description_tokens']
-    normalization_coefficient = 0
-    query_tokens = set(query_tokens)
+
     for token in all_tokens_in_document:
         if token in tf.keys():
             tf[token] += 1
         else:
             tf[token] = 1
+
+    for token in set(all_tokens_in_document):
+        idf[token] = math.log(N/len(inverted_index[token]))
+    normalization_coefficient = 0
+    query_tokens = set(query_tokens)
+
     for key in tf.keys():
-        normalization_coefficient += tf[key] ** 2
+        normalization_coefficient += ((math.log(tf[key]) + 1) * idf[key]) ** 2
     normalization_coefficient = normalization_coefficient ** 0.5
     vector = []
     for token in query_tokens:
         t = math.log(tf[token]) + 1
-        vector.append(t/normalization_coefficient)
+        vector.append((t * idf[token])/normalization_coefficient)
     return vector
 def normalize(vector):
     weight_sum = 0
@@ -120,7 +128,7 @@ def relevent_docIDs_with_tf_idf(query,lang = "en",part = "both"):
     document_vectors = {}
     for doc_id in relevant_documents:
         document_vectors[doc_id] = build_document_vector_from_document_tokens(doc_id=doc_id,query_tokens = query_tokens
-                                                                     ,document_tokens = document_tokens,part= part)
+                                                                     ,document_tokens = document_tokens,part= part,inverted_index = inverted_index)
 
     query_vector = []
     query_tf = {}
@@ -132,8 +140,7 @@ def relevent_docIDs_with_tf_idf(query,lang = "en",part = "both"):
 
     for token in set(query_tokens):
         I = 1 + math.log(query_tf[token])
-        T = idf_token[token]
-        query_vector.append(I * T)
+        query_vector.append(I)
     query_vector = normalize(query_vector)
     tf_idf = {}
     for key in document_vectors.keys():
