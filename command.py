@@ -55,6 +55,15 @@ def Read_And_AddDocsFile(path, lang="en"):
             i += 1
 
 
+def Add_New_Doc_in_csv_file(title, description):
+    doc_info = ['' for i in range(18)]
+    doc_info[1] = title
+    doc_info[14] = description
+    with open('data/ted_talks.csv', 'a', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(doc_info)
+
+
 print("###################  Commands  ########################\n")
 print("- for load doc's file:")
 print("\tadd-docs-file  input-path  lang")
@@ -134,5 +143,7 @@ while True:
             print("\t enter doc text\n\t := ", end="")
             text = input()
             AddDoc(lang=lang,  title=title, text=text)
+            if lang == "en":
+                Add_New_Doc_in_csv_file(title, text)
     except Exception as e:
         print("#Error: ", e)
