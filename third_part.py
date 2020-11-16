@@ -6,7 +6,7 @@ import json
 import functools as ft
 
 
-def gamma_encoding(postings): 
+def gamma_encoding(postings):
     gapList = get_gaps_list(postings)
     gapList[0] += 2 # to adapt 0,1 in gamma encoding
     res =  ''.join([get_length(get_offset(gap))+get_offset(gap) for gap in gapList])
@@ -18,9 +18,7 @@ def gamma_decoding(gamma):
     while gamma != "":
         aux = gamma.find('0')
         length = gamma[:aux]
-        if length == "":
-            res.append(1)
-            gamma = gamma[1:]
+        if length == "": res.append(1); gamma = gamma[1:]
         else:
             offset = "1"+gamma[aux+1:aux+1+int(unary_decodification(length))]
             res.append(int(offset, 2))

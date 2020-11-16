@@ -71,7 +71,6 @@ def Read_And_AddDocsFile(path, lang="en"):
                     else:
                         FA_Token_Repetition[tok] += 1
                 i += 1
-        print("i: ", i)
 
 
 def Add_New_Doc_in_csv_file(title, description, lang="en",):
