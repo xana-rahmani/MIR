@@ -72,15 +72,15 @@ def dot_product(v1,v2):
 
 
 ## main function
-def relevent_docIDs_with_tf_idf(query,lang = "en",part = "both"):
-    query_tokens = prepare_text(query,lang = lang)
+def relevent_docIDs_with_tf_idf(query, lang="en", part="both"):
+    query_tokens = prepare_text(query, lang=lang)
     inverted_index = {}
     bigram_path = ''
     document_tokens = {}
     if lang == "en":
         with open('en_decompressed.txt', 'r', encoding='utf-8') as f:
             inverted_index = json.loads(f.read())
-        bigram_path ="english_bigram.txt"
+        bigram_path ="en_bigrame.txt"
         with open('EN_Tokens.txt', 'r', encoding='utf-8') as f:
             document_tokens = json.loads(f.read())
 
@@ -89,7 +89,7 @@ def relevent_docIDs_with_tf_idf(query,lang = "en",part = "both"):
         with open('fa_decompressed.txt', 'r', encoding='utf-8') as f:
             inverted_index = json.loads(f.read())
         inverted_index = {}
-        bigram_path = 'persian_bigram.txt'
+        bigram_path = 'fa_bigrame.txt'
         with open('FA_Tokens.txt', 'r', encoding='utf-8') as f:
             document_tokens = json.loads(f.read())
     postings = []#consists only of doc_ids
@@ -156,22 +156,6 @@ def relevent_docIDs_with_tf_idf(query,lang = "en",part = "both"):
         tf_idf[key] = dot_product(document_vectors[key],query_vector)
     result = sorted(tf_idf.items(), key=operator.itemgetter(1))
     if len(result) > 10:
-        return [tuple[0] for tuple in result[-10:]]
+        return [tuple[0] for tuple in result[-10:]][::-1]
     else:
-        return [tuple[0] for tuple in result]
-
-
-# with open('EN_Tokens.txt', 'r', encoding='utf-8') as f:
-#     document_tokens = json.loads(f.read())
-# rel = relevent_docIDs_with_tf_idf('world\'s biggest','en','description')
-# print(rel)
-# for re in rel:
-#     print(document_tokens[str(re)])
-#     print("********")
-
-
-
-
-
-
-
+        return [tuple[0] for tuple in result][::-1]

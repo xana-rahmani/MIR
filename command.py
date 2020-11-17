@@ -105,6 +105,62 @@ def Write__Removed_DOC_ID_in_csv(doc_id, lang="en"):
         writer.writerow([doc_id])
 
 
+def ShowRelevantDoc(relevantDocIDs, lang):
+    doc_info = {}
+    if lang == "en":
+        with open(path, encoding='utf-8') as csv_file:
+            read_csv = csv.reader(csv_file)
+            fields = next(read_csv)
+            title_index = fields.index("title")
+            description_index = fields.index("description")
+            id = 1
+            for row in read_csv:
+                if id in relevantDocIDs:
+                    doc_info[id] = {
+                        "title": row[title_index],
+                        "description": row[description_index]
+                    }
+                id += 1
+    if lang == "fa":
+        root = Et.parse(path).getroot()
+        file_path = "{http://www.mediawiki.org/xml/export-0.10/}"
+        id = 1
+        for title_tag in root.iter(file_path + 'title'):
+            if id in relevantDocIDs:
+                doc_info[id] = {
+                    "title": title_tag.text,
+                }
+            id += 1
+        id = 1
+        for text_tag in root.iter(file_path + 'text'):
+            if id in relevantDocIDs:
+                doc_info[id] = {
+                    "description": text_tag.text,
+                }
+            id += 1
+        with open("data/Added_Doc.csv", encoding='utf-8') as csv_file:
+            read_csv = csv.reader(csv_file)
+            fields = next(read_csv)
+            csv_title_index = fields.index("title")
+            csv_description_index = fields.index("description")
+            for row in read_csv:
+                if id in relevantDocIDs:
+                    doc_info[id] = {
+                        "title": row[csv_title_index],
+                        "description": row[csv_description_index]
+                    }
+                id += 1
+
+    print("\n----------------------------------------------------------------------\n")
+    for i in relevantDocIDs:
+        print("# DOC ID: ", i)
+        print("_Title")
+        print("\t", doc_info.get(i).get("title"))
+        print("_Description")
+        print("\t", doc_info.get(i).get("description"))
+        print("\n----------------------------------------------------------------------\n")
+
+
 print("###################  Commands  ########################\n")
 print("- for load doc's file:")
 print("\tadd-docs-file  input-path  lang")
@@ -192,8 +248,10 @@ while True:
             lang = input()
             print("\t enter query\n\t := ", end="")
             query = input()
-            print("\t enter the part of document you would like your query to be searched in\n\t := ", end="")
+            print("\t enter the part of document you would like your query to be searched in (title, description, both)\n\t := ", end="")
             part = input()
-            print(relevent_docIDs_with_tf_idf(query=query, lang=lang, part=part))
+            relevant_docIDs = relevent_docIDs_with_tf_idf(query=query, lang=lang, part=part)
+            print(relevant_docIDs)
+            ShowRelevantDoc(relevant_docIDs, lang)
     except Exception as e:
         print("#Error: ", e)
