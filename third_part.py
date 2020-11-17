@@ -108,4 +108,8 @@ def decompress_file(fileName, coding):
             elif postingList[i][1] == 2:
                 data[word][i][4] = mode(postingList[i][4])
                 data[word][i][2] = mode(postingList[i][2])
-    return data
+    # write to file
+    lang = fileName[0:2]
+    decompressedFileName = lang + '_' + 'decompressed.txt'
+    with open(decompressedFileName, 'w', encoding='utf-8') as f:
+        f.write(json.dumps(data))
