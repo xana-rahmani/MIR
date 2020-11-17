@@ -144,7 +144,7 @@ while True:
             # decompress fa_inverted.txt variableByte
             fileName = command[1]
             coding = command[2]
-            data = decompress_file(fileName, coding)
+            decompress_file(fileName, coding)
         if command[0] == "spell-checker":
             # spell_checker en_bigrame.txt Spidir
             bigram_path = command[1]
