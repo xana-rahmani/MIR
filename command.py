@@ -85,8 +85,8 @@ def Read_And_AddDocsFile(path, lang="en"):
 def Add_New_Doc_in_csv_file(title, description, lang="en",):
     if lang == "en":
         doc_info = ['' for i in range(18)]
-        doc_info[1] = title
-        doc_info[14] = description
+        doc_info[14] = title
+        doc_info[1] = description
         path = "data/ted_talks.csv"
         with open(path, 'a', newline='') as f:
             writer = csv.writer(f)
@@ -167,7 +167,7 @@ print("\tadd-docs-file  input-path  lang")
 print("- for create invert index:")
 print("\tcreate-invert-index  lang  output-path")
 print("- for remove doc with id:")
-print("\tremove-doc doc_id  inverted_file_path  bigrame_file_path")
+print("\tremove-doc doc_id")
 print("\n#######################################################\n")
 while True:
     try:
@@ -226,12 +226,15 @@ while True:
             temp = Spell_Checker(words_not_found, bigram_path)
             print(temp)
         elif command[0] == "remove-doc":
-            # remove-doc 1878 en en_inverted.txt en_bigrame.txt
-            # remove-doc 146 fa fa_inverted.txt fa_bigrame.txt
+            # remove-doc 1878 en
+            # remove-doc 146 fa
             doc_id = command[1]
             lang = command[2]
-            inverted_file_path = command[3]
-            bigrame_file_path = command[4]
+            inverted_file_path = "en_inverted.txt"
+            bigrame_file_path = "en_bigrame.txt"
+            if lang == "fa":
+                inverted_file_path = "fa_inverted.txt"
+                bigrame_file_path = "fa_bigrame.txt"
             RemoveDoc(int(doc_id), lang, inverted_file_path, bigrame_file_path)
             Write__Removed_DOC_ID_in_csv(int(doc_id), lang)
         elif command[0] == "add-doc":
