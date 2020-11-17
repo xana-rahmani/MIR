@@ -33,7 +33,7 @@ def build_document_vector_from_document_tokens(doc_id,query_tokens,document_toke
     elif part == 'description':
         all_tokens_in_document = document_tokens[str(doc_id)]['description']
     else:
-        all_tokens_in_document = document_tokens[str(doc_id)]['title_token'] + document_tokens[doc_id]['description']
+        all_tokens_in_document = document_tokens[str(doc_id)]['title_token'] + document_tokens[str(doc_id)]['description']
 
     for token in all_tokens_in_document:
         if token in tf.keys():
@@ -169,10 +169,10 @@ def relevent_docIDs_with_tf_idf(query, lang="en", part="both"):
         return [tuple[0] for tuple in result][::-1]
 
 
-# with open('EN_Tokens.txt', 'r', encoding='utf-8') as f:
-#     document_tokens = json.loads(f.read())
-# rel = relevent_docIDs_with_tf_idf('spidir','en','description')
-# print(rel)
+with open('EN_Tokens.txt', 'r', encoding='utf-8') as f:
+    document_tokens = json.loads(f.read())
+rel = relevent_docIDs_with_tf_idf('spidir','en','both')
+print(rel)
 # for re in rel:
 #     print(document_tokens[str(re)])
 #     print("********")
