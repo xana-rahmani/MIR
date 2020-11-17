@@ -165,15 +165,18 @@ def ShowRelevantDoc(relevantDocIDs, lang):
                     "description": text_tag.text,
                 }
             id += 1
-        with open("data/Added_Doc.csv", encoding='utf-8') as csv_file:
-            read_csv = csv.reader(csv_file)
-            for row in read_csv:
-                if id in relevantDocIDs:
-                    doc_info[id] = {
-                        "title": row[0],
-                        "description": row[1]
-                    }
-                id += 1
+        try:
+            with open("data/Added_Doc.csv", encoding='utf-8') as csv_file:
+                read_csv = csv.reader(csv_file)
+                for row in read_csv:
+                    if id in relevantDocIDs:
+                        doc_info[id] = {
+                            "title": row[0],
+                            "description": row[1]
+                        }
+                    id += 1
+        except:
+            pass
 
     print("\n----------------------------------------------------------------------\n")
     for i in relevantDocIDs:
