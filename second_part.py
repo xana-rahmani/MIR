@@ -168,9 +168,11 @@ def RemoveDoc(doc_id, lang, inverted_file_path, bigrame_file_path):
     if lang == "en":
         Tokens = EN_Tokens
         token_repetition = EN_Token_Repetition
+        token_path = "EN_Tokens.txt"
     elif lang == "fa":
         Tokens = FA_Tokens
         token_repetition = FA_Token_Repetition
+        token_path = "FA_Tokens.txt"
 
     doc_tokens = Tokens.get(doc_id, None)
     if doc_tokens is None:
@@ -235,6 +237,8 @@ def RemoveDoc(doc_id, lang, inverted_file_path, bigrame_file_path):
     compress_file(inverted_file_path, "gamma", show_print=False)
     decompress_file(inverted_file_path, "gamma")
     Tokens.pop(doc_id)
+    with open(token_path, 'w', encoding='utf-8') as f:
+        f.write(json.dumps(Tokens, ensure_ascii=False))
 
 
 def Write_Update_Invert_Index(inverted_index, output_path):
@@ -295,11 +299,13 @@ def AddDoc(lang, title, text):
         Token_Repetition = EN_Token_Repetition
         inverted_path = "en_inverted.txt"
         bigrame_path = "en_bigrame.txt"
+        token_path = "EN_Tokens.txt"
     elif lang == "fa":
         Tokens = FA_Tokens
         Token_Repetition = FA_Token_Repetition
         inverted_path = "fa_inverted.txt"
         bigrame_path = "fa_bigrame.txt"
+        token_path = "FA_Tokens.txt"
 
     """ Find DOC ID """
     doc_id = list(Tokens.keys())[-1] + 1
@@ -309,6 +315,8 @@ def AddDoc(lang, title, text):
         "title_token": title_tokens,
         "description": description_tokens
     }
+    with open(token_path, 'w', encoding='utf-8') as f:
+        f.write(json.dumps(Tokens, ensure_ascii=False))
 
     """ update Tokens Repetition """
     for tok in title_tokens + description_tokens:
@@ -358,6 +366,8 @@ def AddDoc(lang, title, text):
                 temp_inverted_index[token] = [add_posting]
         Write_Update_Invert_Index(temp_inverted_index, inverted_path)
         temp_inverted_index.clear()
+        compress_file(inverted_path, "gamma", show_print=False)
+        decompress_file(inverted_path, "gamma")
 
     """ Add Tokens in bigram index """
     temp_bigrame_index = Load__bigrame_Index_File(bigrame_path)
