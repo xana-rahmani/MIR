@@ -1,7 +1,10 @@
 from first_part import prepare_text
 from fourth_part import Spell_Checker
 from math import *
+import json
 import operator
+from third_part import *
+from command import *
 def intersect(postingList1,postingList2):
     answers = []#list of documents mutual in both posting lists
     p1 = 0
@@ -72,17 +75,17 @@ def relevent_docIDs_with_tf_idf(query,lang = "en",part = "both"):
     bigram_path =''
     document_tokens = {}
     if lang == "en":
-        inverted_index = {}
-        bigram_path =''
-        document_tokens = {}
+        with open('en_decompressed.txt', 'r', encoding='utf-8') as f:
+            inverted_index = json.loads(f.read())
+        bigram_path ='english_bigram.txt'
+        document_tokens = EN_Tokens
         #open en_tokens
-        #TODO
     else:
+        with open('fa_decompressed.txt', 'r', encoding='utf-8') as f:
+            inverted_index = json.loads(f.read())
         inverted_index = {}
-        bigram_path = ''
-        document_tokens = {}
-        #open persian_tokens
-        #TODO
+        bigram_path = 'persian_bigram.txt'
+        document_tokens = FA_Tokens
     postings = []#consists only of doc_ids
     words_not_found =[]
     idf_token = {}# the dft of the tokens in the query
