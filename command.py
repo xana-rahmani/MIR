@@ -57,24 +57,24 @@ def Read_And_AddDocsFile(path, lang="en"):
                 else:
                     FA_Token_Repetition[tok] += 1
             i += 1
-        with open("data/Added_Doc.csv", encoding='utf-8') as csv_file:
-            read_csv = csv.reader(csv_file)
-            fields = next(read_csv)
-            csv_title_index = fields.index("title")
-            csv_description_index = fields.index("description")
-            for row in read_csv:
-                title_tokens = prepare_text(text=row[csv_title_index], lang="en")
-                description_tokens = prepare_text(text=row[csv_description_index], lang="en")
-                EN_Tokens[i] = {
-                    "title_token": title_tokens,
-                    "description": description_tokens
-                }
-                for tok in title_tokens + description_tokens:
-                    if tok not in FA_Token_Repetition.keys():
-                        FA_Token_Repetition[tok] = 1
-                    else:
-                        FA_Token_Repetition[tok] += 1
-                i += 1
+        try:
+            with open("data/Added_Doc.csv", encoding='utf-8') as csv_file:
+                read_csv = csv.reader(csv_file)
+                for row in read_csv:
+                    title_tokens = prepare_text(text=row[0], lang="en")
+                    description_tokens = prepare_text(text=row[1], lang="en")
+                    EN_Tokens[i] = {
+                        "title_token": title_tokens,
+                        "description": description_tokens
+                    }
+                    for tok in title_tokens + description_tokens:
+                        if tok not in FA_Token_Repetition.keys():
+                            FA_Token_Repetition[tok] = 1
+                        else:
+                            FA_Token_Repetition[tok] += 1
+                    i += 1
+        except Exception as e:
+            pass
         with open('FA_Tokens.txt', 'w', encoding='utf-8') as f:
             f.write(json.dumps(FA_Tokens, ensure_ascii=False))
 
@@ -140,14 +140,11 @@ def ShowRelevantDoc(relevantDocIDs, lang):
             id += 1
         with open("data/Added_Doc.csv", encoding='utf-8') as csv_file:
             read_csv = csv.reader(csv_file)
-            fields = next(read_csv)
-            csv_title_index = fields.index("title")
-            csv_description_index = fields.index("description")
             for row in read_csv:
                 if id in relevantDocIDs:
                     doc_info[id] = {
-                        "title": row[csv_title_index],
-                        "description": row[csv_description_index]
+                        "title": row[0],
+                        "description": row[1]
                     }
                 id += 1
 

@@ -122,7 +122,6 @@ def Load__Invert_Index_File(load_file_path):
                 index[key] = new_docs
             return index
     except Exception as e:
-        print("#Erorr in Load Invert Index File: ", e)
         return None
 
 
@@ -270,12 +269,15 @@ def Write_Update_Invert_Index(inverted_index, output_path):
 
 
 def Load__bigrame_Index_File(load_file_path):
-    with open(load_file_path, 'r') as file:
-        data = file.read()
-        if len(data) == 0:
-            return None
-        loaded_index = json.loads(data)
-        return loaded_index
+    try:
+        with open(load_file_path, 'r') as file:
+            data = file.read()
+            if len(data) == 0:
+                return None
+            loaded_index = json.loads(data)
+            return loaded_index
+    except:
+        return None
 
 
 def Write_Update_Bigrame_Index(bigram_index, output_path):
@@ -317,62 +319,60 @@ def AddDoc(lang, title, text):
 
     """ Add Tokens in inverted index """
     temp_inverted_index = Load__Invert_Index_File(inverted_path)
-    if temp_inverted_index is None or not bool(temp_inverted_index) or Tokens is None:
-        return
-    for token in set(title_tokens + description_tokens):
-        add_posting = {
-            "doc_ID": doc_id
-        }
-        if token in title_tokens:
-            add_posting["part"] = "t"
-            add_posting['title_positions'] = []
-            add_posting['title_repetitions'] = 0
-            for i in range(len(title_tokens)):
-                if title_tokens[i] == token:
-                    add_posting['title_positions'].append(i)
-                    add_posting['title_repetitions'] += 1
-        if token in description_tokens:
-            if add_posting.get('part') == 't':
-                add_posting['part'] = 'b'
-            else:
-                add_posting['part'] = 'd'
-            add_posting['description_positions'] = []
-            add_posting['description_repetitions'] = 0
-            for i in range(len(description_tokens)):
-                if description_tokens[i] == token:
-                    add_posting['description_positions'].append(i)
-                    add_posting['description_repetitions'] += 1
-        Posting = temp_inverted_index.get(token)
-        if Posting is not None:
-            newPosting = []
-            for i in range(len(Posting)):
-                if Posting[i].get("doc_ID") < add_posting.get("doc_ID"):
-                    newPosting.append(Posting[i])
+    if temp_inverted_index is not None and bool(temp_inverted_index) and Tokens is not None:
+        for token in set(title_tokens + description_tokens):
+            add_posting = {
+                "doc_ID": doc_id
+            }
+            if token in title_tokens:
+                add_posting["part"] = "t"
+                add_posting['title_positions'] = []
+                add_posting['title_repetitions'] = 0
+                for i in range(len(title_tokens)):
+                    if title_tokens[i] == token:
+                        add_posting['title_positions'].append(i)
+                        add_posting['title_repetitions'] += 1
+            if token in description_tokens:
+                if add_posting.get('part') == 't':
+                    add_posting['part'] = 'b'
                 else:
-                    newPosting.append(add_posting)
-                    newPosting.append(Posting[i:])
-                    break
-            temp_inverted_index[token] = newPosting
-        else:
-            temp_inverted_index[token] = [add_posting]
-    Write_Update_Invert_Index(temp_inverted_index, inverted_path)
-    temp_inverted_index.clear()
+                    add_posting['part'] = 'd'
+                add_posting['description_positions'] = []
+                add_posting['description_repetitions'] = 0
+                for i in range(len(description_tokens)):
+                    if description_tokens[i] == token:
+                        add_posting['description_positions'].append(i)
+                        add_posting['description_repetitions'] += 1
+            Posting = temp_inverted_index.get(token)
+            if Posting is not None:
+                newPosting = []
+                for i in range(len(Posting)):
+                    if Posting[i].get("doc_ID") < add_posting.get("doc_ID"):
+                        newPosting.append(Posting[i])
+                    else:
+                        newPosting.append(add_posting)
+                        newPosting.append(Posting[i:])
+                        break
+                temp_inverted_index[token] = newPosting
+            else:
+                temp_inverted_index[token] = [add_posting]
+        Write_Update_Invert_Index(temp_inverted_index, inverted_path)
+        temp_inverted_index.clear()
 
     """ Add Tokens in bigram index """
     temp_bigrame_index = Load__bigrame_Index_File(bigrame_path)
-    if temp_bigrame_index is None or not bool(temp_bigrame_index):
-        return
-    all_tokens = list(title_tokens + description_tokens)
-    all_tokens.sort()
-    for token in all_tokens:
-        t = "$" + token + "$"
-        for i in range(0, len(t) - 1):
-            bigrame = t[i:i + 2]
-            if bigrame in temp_bigrame_index.keys():
-                if token in temp_bigrame_index[bigrame]:
-                    continue
-                temp_bigrame_index[bigrame].append(token)
-            else:
-                temp_bigrame_index[bigrame] = [token]
-    Write_New_Bigram_Index(temp_bigrame_index, bigrame_path)
-    temp_bigrame_index.clear()
+    if temp_bigrame_index is not None and bool(temp_bigrame_index):
+        all_tokens = list(title_tokens + description_tokens)
+        all_tokens.sort()
+        for token in all_tokens:
+            t = "$" + token + "$"
+            for i in range(0, len(t) - 1):
+                bigrame = t[i:i + 2]
+                if bigrame in temp_bigrame_index.keys():
+                    if token in temp_bigrame_index[bigrame]:
+                        continue
+                    temp_bigrame_index[bigrame].append(token)
+                else:
+                    temp_bigrame_index[bigrame] = [token]
+        Write_New_Bigram_Index(temp_bigrame_index, bigrame_path)
+        temp_bigrame_index.clear()
