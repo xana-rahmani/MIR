@@ -106,7 +106,7 @@ while True:
             continue
         if command[0] == "prepare-text":
             # prepare-text en "Hello Modern Information Retrieval"
-            # prepare-text fa "سلام درس بازیابی"
+            # prepare-text fa درس بازیابی اطلاعات
             lang = command[1]
             text = " ".join(command[2:])
             tokens = prepare_text(text, lang)
