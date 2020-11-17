@@ -8,6 +8,11 @@ FA_Tokens = {}
 EN_Token_Repetition = {}
 FA_Token_Repetition = {}
 
+Last_Doc_ID = {
+    "EN": 0,
+    "FA": 0
+}
+
 INVERTED_INDEX = {}
 Bigram_Index = {}
 
@@ -300,15 +305,16 @@ def AddDoc(lang, title, text):
         inverted_path = "en_inverted.txt"
         bigrame_path = "en_bigrame.txt"
         token_path = "EN_Tokens.txt"
+        doc_id = Last_Doc_ID["EN"] + 1
+        Last_Doc_ID["EN"] += 1
     elif lang == "fa":
         Tokens = FA_Tokens
         Token_Repetition = FA_Token_Repetition
         inverted_path = "fa_inverted.txt"
         bigrame_path = "fa_bigrame.txt"
         token_path = "FA_Tokens.txt"
-
-    """ Find DOC ID """
-    doc_id = list(Tokens.keys())[-1] + 1
+        doc_id = Last_Doc_ID["FA"] + 1
+        Last_Doc_ID["FA"] += 1
 
     """ Add Tokens in dic """
     Tokens[doc_id] = {
@@ -359,8 +365,11 @@ def AddDoc(lang, title, text):
                         newPosting.append(Posting[i])
                     else:
                         newPosting.append(add_posting)
+                        add_posting = None
                         newPosting.append(Posting[i:])
                         break
+                if add_posting is not None:
+                    newPosting.append(add_posting)
                 temp_inverted_index[token] = newPosting
             else:
                 temp_inverted_index[token] = [add_posting]

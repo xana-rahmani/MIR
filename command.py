@@ -2,7 +2,7 @@ import csv
 import xml.etree.ElementTree as Et
 from first_part import prepare_text
 from second_part import Create_Inverted_Index, Create_Bigrame, FA_Tokens, FA_Token_Repetition, EN_Tokens, \
-    EN_Token_Repetition, RemoveDoc, AddDoc
+    EN_Token_Repetition, RemoveDoc, AddDoc, Last_Doc_ID
 from third_part import compress_file, decompress_file
 from fourth_part import Spell_Checker
 from Fifth_part import relevent_docIDs_with_tf_idf
@@ -30,6 +30,7 @@ def Read_And_AddDocsFile(path, lang="en"):
                     else:
                         EN_Token_Repetition[tok] += 1
                 doc_id += 1
+            Last_Doc_ID["EN"] = doc_id - 1
         with open('EN_Tokens.txt', 'w', encoding='utf-8') as f:
             f.write(json.dumps(EN_Tokens, ensure_ascii=False))
     if lang == "fa":
@@ -57,6 +58,7 @@ def Read_And_AddDocsFile(path, lang="en"):
                 else:
                     FA_Token_Repetition[tok] += 1
             i += 1
+        Last_Doc_ID["FA"] = i - 1
         try:
             with open("data/Added_Doc.csv", encoding='utf-8') as csv_file:
                 read_csv = csv.reader(csv_file)
@@ -73,6 +75,7 @@ def Read_And_AddDocsFile(path, lang="en"):
                         else:
                             FA_Token_Repetition[tok] += 1
                     i += 1
+                Last_Doc_ID["FA"] = i - 1
         except Exception as e:
             pass
         with open('FA_Tokens.txt', 'w', encoding='utf-8') as f:
@@ -245,7 +248,8 @@ while True:
             lang = input()
             print("\t enter query\n\t := ", end="")
             query = input()
-            print("\t enter the part of document you would like your query to be searched in (title, description, both)\n\t := ", end="")
+            print("\t enter the part of document you would like your query to be searched in (title, description, both)"
+                  "\n\t := ", end="")
             part = input()
             relevant_docIDs = relevent_docIDs_with_tf_idf(query=query, lang=lang, part=part)
             print(relevant_docIDs)
