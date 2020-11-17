@@ -18,6 +18,8 @@ def intersect(postingList1,postingList2):
         else:
             p2 += 1
     return answers
+
+
 def build_document_vector_from_document_tokens(doc_id,query_tokens,document_tokens,part,inverted_index):
     #building vector for a document based on inc
     #the final vector only comprises of the tokens in the query
@@ -52,12 +54,15 @@ def build_document_vector_from_document_tokens(doc_id,query_tokens,document_toke
         t = math.log(tf[token]) + 1
         vector.append((t * idf[token])/normalization_coefficient)
     return vector
+
+
 def normalize(vector):
     weight_sum = 0
     for v in vector:
         weight_sum += v ** 2
     weight_sum = weight_sum ** 0.5
     return [v/weight_sum for v in vector]
+
 
 def dot_product(v1,v2):
     result = 0
@@ -67,16 +72,15 @@ def dot_product(v1,v2):
 
 
 ## main function
-
 def relevent_docIDs_with_tf_idf(query,lang = "en",part = "both"):
     query_tokens = prepare_text(query,lang = lang)
     inverted_index = {}
-    bigram_path =''
+    bigram_path = ''
     document_tokens = {}
     if lang == "en":
         with open('en_decompressed.txt', 'r', encoding='utf-8') as f:
             inverted_index = json.loads(f.read())
-        bigram_path ='english_bigram.txt'
+        bigram_path ="english_bigram.txt"
         with open('EN_Tokens.txt', 'r', encoding='utf-8') as f:
             document_tokens = json.loads(f.read())
 
@@ -122,14 +126,14 @@ def relevent_docIDs_with_tf_idf(query,lang = "en",part = "both"):
                 if element[1] == 1 or element[1] == 2:
                     doc_ids.append(element[0])
         postings.append(doc_ids)
-    postings.sort(key=len) #sorting the postings based on their lengths.it's a good practice for finding the intersections
+    postings.sort(key=len)  # sorting the postings based on their lengths.it's a good practice for finding the intersections
     i = 1
     relevant_documents = postings[0]
     while i < len(postings):
         relevant_documents = intersect(relevant_documents,postings[i])
         i += 1
-    ###sorting answer based on tf_idf
-    #creating vector for each of the relevant documents:
+    # sorting answer based on tf_idf
+    # creating vector for each of the relevant documents:
     document_vectors = {}
     for doc_id in relevant_documents:
         document_vectors[doc_id] = build_document_vector_from_document_tokens(doc_id=doc_id,query_tokens = query_tokens

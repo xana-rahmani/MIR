@@ -171,7 +171,10 @@ def RemoveDoc(doc_id, lang, inverted_file_path, bigrame_file_path):
         Tokens = FA_Tokens
         token_repetition = FA_Token_Repetition
 
-    doc_tokens = Tokens.get(doc_id)
+    doc_tokens = Tokens.get(doc_id, None)
+    if doc_tokens is None:
+        print("Invalid DOC ID")
+        return
     title_token = doc_tokens.get("title_token", [])
     description_token = doc_tokens.get("description", [])
 
@@ -181,6 +184,8 @@ def RemoveDoc(doc_id, lang, inverted_file_path, bigrame_file_path):
         for token in set(title_token):
             posting = temp_invert_index.get(token)
             new_posting = []
+            if posting is None:
+                continue
             for p in posting:
                 if p.get("doc_ID") == doc_id:
                     token_repetition[token] = token_repetition.get(token) - p.get("title_repetitions")
@@ -193,6 +198,8 @@ def RemoveDoc(doc_id, lang, inverted_file_path, bigrame_file_path):
         for token in set(description_token):
             posting = temp_invert_index.get(token)
             new_posting = []
+            if posting is None:
+                continue
             for p in posting:
                 if p.get("doc_ID") == doc_id:
                     token_repetition[token] = token_repetition.get(token) - p.get("description_repetitions")

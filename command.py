@@ -96,6 +96,15 @@ def Add_New_Doc_in_csv_file(title, description, lang="en",):
             writer.writerow(doc_info)
 
 
+def Write__Removed_DOC_ID_in_csv(doc_id, lang="en"):
+    path = "data/EN_Removed_Docs.csv"
+    if lang == "fa":
+        path = "data/FA_Removed_Docs.csv"
+    with open(path, 'a', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        writer.writerow([doc_id])
+
+
 print("###################  Commands  ########################\n")
 print("- for load doc's file:")
 print("\tadd-docs-file  input-path  lang")
@@ -168,6 +177,7 @@ while True:
             inverted_file_path = command[3]
             bigrame_file_path = command[4]
             RemoveDoc(int(doc_id), lang, inverted_file_path, bigrame_file_path)
+            Write__Removed_DOC_ID_in_csv(int(doc_id), lang)
         elif command[0] == "add-doc":
             print("\t enter doc language\n\t := ", end="")
             lang = input()
@@ -184,6 +194,6 @@ while True:
             query = input()
             print("\t enter the part of document you would like your query to be searched in\n\t := ", end="")
             part = input()
-            print(relevent_docIDs_with_tf_idf(query = query,lang= lang,part=part))
+            print(relevent_docIDs_with_tf_idf(query=query, lang=lang, part=part))
     except Exception as e:
         print("#Error: ", e)
