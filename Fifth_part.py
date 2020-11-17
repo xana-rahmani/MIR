@@ -4,7 +4,6 @@ from math import *
 import json
 import operator
 from third_part import *
-from command import *
 def intersect(postingList1,postingList2):
     answers = []#list of documents mutual in both posting lists
     p1 = 0
@@ -28,11 +27,11 @@ def build_document_vector_from_document_tokens(doc_id,query_tokens,document_toke
     all_tokens_in_document = []
 
     if part == 'title':
-        all_tokens_in_document = document_tokens[doc_id]['title_tokens']
+        all_tokens_in_document = document_tokens[str(doc_id)]['title_token']
     elif part == 'description':
-        all_tokens_in_document = document_tokens[doc_id]['description_tokens']
+        all_tokens_in_document = document_tokens[str(doc_id)]['description']
     else:
-        all_tokens_in_document = document_tokens[doc_id]['title_tokens'] + document_tokens[doc_id]['description_tokens']
+        all_tokens_in_document = document_tokens[str(doc_id)]['title_token'] + document_tokens[doc_id]['description']
 
     for token in all_tokens_in_document:
         if token in tf.keys():
@@ -78,14 +77,17 @@ def relevent_docIDs_with_tf_idf(query,lang = "en",part = "both"):
         with open('en_decompressed.txt', 'r', encoding='utf-8') as f:
             inverted_index = json.loads(f.read())
         bigram_path ='english_bigram.txt'
-        document_tokens = EN_Tokens
+        with open('EN_Tokens.txt', 'r', encoding='utf-8') as f:
+            document_tokens = json.loads(f.read())
+
         #open en_tokens
     else:
         with open('fa_decompressed.txt', 'r', encoding='utf-8') as f:
             inverted_index = json.loads(f.read())
         inverted_index = {}
         bigram_path = 'persian_bigram.txt'
-        document_tokens = FA_Tokens
+        with open('FA_Tokens.txt', 'r', encoding='utf-8') as f:
+            document_tokens = json.loads(f.read())
     postings = []#consists only of doc_ids
     words_not_found =[]
     idf_token = {}# the dft of the tokens in the query
@@ -154,6 +156,14 @@ def relevent_docIDs_with_tf_idf(query,lang = "en",part = "both"):
     else:
         return [tuple[0] for tuple in result]
 
+
+# with open('EN_Tokens.txt', 'r', encoding='utf-8') as f:
+#     document_tokens = json.loads(f.read())
+# rel = relevent_docIDs_with_tf_idf('world\'s biggest','en','description')
+# print(rel)
+# for re in rel:
+#     print(document_tokens[str(re)])
+#     print("********")
 
 
 

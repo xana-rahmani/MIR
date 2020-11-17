@@ -5,6 +5,8 @@ from second_part import Create_Inverted_Index, Create_Bigrame, FA_Tokens, FA_Tok
     EN_Token_Repetition, RemoveDoc, AddDoc
 from third_part import compress_file, decompress_file
 from fourth_part import Spell_Checker
+from Fifth_part import relevent_docIDs_with_tf_idf
+import json
 
 
 def Read_And_AddDocsFile(path, lang="en"):
@@ -28,6 +30,8 @@ def Read_And_AddDocsFile(path, lang="en"):
                     else:
                         EN_Token_Repetition[tok] += 1
                 doc_id += 1
+        with open('EN_Tokens.txt', 'w', encoding='utf-8') as f:
+            f.write(json.dumps(EN_Tokens, ensure_ascii=False))
     if lang == "fa":
         root = Et.parse(path).getroot()
         file_path = "{http://www.mediawiki.org/xml/export-0.10/}"
@@ -71,6 +75,8 @@ def Read_And_AddDocsFile(path, lang="en"):
                     else:
                         FA_Token_Repetition[tok] += 1
                 i += 1
+        with open('FA_Tokens.txt', 'w', encoding='utf-8') as f:
+            f.write(json.dumps(FA_Tokens, ensure_ascii=False))
 
 
 def Add_New_Doc_in_csv_file(title, description, lang="en",):
@@ -101,7 +107,8 @@ print("\n#######################################################\n")
 while True:
     try:
         print("$ ", end="")
-        command = input().split()
+        input_command = input()
+        command = input_command.split()
         if command is None:
             continue
         if command[0] == "prepare-text":
@@ -111,25 +118,25 @@ while True:
             text = " ".join(command[2:])
             tokens = prepare_text(text, lang)
             print(tokens)
-        if command[0] == "add-docs-file":
+        elif command[0] == "add-docs-file":
             # add-docs-file data/ted_talks.csv en
             # add-docs-file data/Persian.xml fa
             path = command[1]
             lang = command[2]
             Read_And_AddDocsFile(path, lang)
-        if command[0] == "create-invert-index":
+        elif command[0] == "create-invert-index":
             # create-invert-index en en_inverted.txt
             # create-invert-index fa fa_inverted.txt
             lang = command[1]
             output_path = command[2]
             Create_Inverted_Index(lang, output_path)
-        if command[0] == "create-bigrame":
+        elif command[0] == "create-bigrame":
             # create-bigrame en en_bigrame.txt
             # create-bigrame fa fa_bigrame.txt
             lang = command[1]
             output_path = command[2]
             Create_Bigrame(lang, output_path)
-        if command[0] == "compress":
+        elif command[0] == "compress":
             # compress en_inverted.txt gamma
             # compress en_inverted.txt variableByte
             # compress fa_inverted.txt gamma
@@ -137,7 +144,7 @@ while True:
             fileName = command[1]
             coding = command[2]
             compress_file(fileName, coding)
-        if command[0] == "decompress":
+        elif command[0] == "decompress":
             # decompress en_inverted.txt gamma
             # decompress en_inverted.txt variableByte
             # decompress fa_inverted.txt gamma
@@ -145,7 +152,7 @@ while True:
             fileName = command[1]
             coding = command[2]
             decompress_file(fileName, coding)
-        if command[0] == "spell-checker":
+        elif command[0] == "spell-checker":
             # spell_checker en_bigrame.txt Spidir
             bigram_path = command[1]
             words_not_found = []
@@ -153,7 +160,7 @@ while True:
                 words_not_found.append(w)
             temp = Spell_Checker(words_not_found, bigram_path)
             print(temp)
-        if command[0] == "remove-doc":
+        elif command[0] == "remove-doc":
             # remove-doc 1878 en en_inverted.txt en_bigrame.txt
             # remove-doc 146 fa fa_inverted.txt fa_bigrame.txt
             doc_id = command[1]
@@ -161,7 +168,7 @@ while True:
             inverted_file_path = command[3]
             bigrame_file_path = command[4]
             RemoveDoc(int(doc_id), lang, inverted_file_path, bigrame_file_path)
-        if command[0] == "add-doc":
+        elif command[0] == "add-doc":
             print("\t enter doc language\n\t := ", end="")
             lang = input()
             print("\t enter doc title\n\t := ", end="")
@@ -170,5 +177,13 @@ while True:
             text = input()
             AddDoc(lang=lang,  title=title, text=text)
             Add_New_Doc_in_csv_file(title, text, lang)
+        elif command[0] == "query":
+            print("\t language\n\t := ", end="")
+            lang = input()
+            print("\t enter query\n\t := ", end="")
+            query = input()
+            print("\t enter the part of document you would like your query to be searched in\n\t := ", end="")
+            part = input()
+            print(relevent_docIDs_with_tf_idf(query = query,lang= lang,part=part))
     except Exception as e:
         print("#Error: ", e)
