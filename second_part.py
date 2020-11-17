@@ -1,5 +1,7 @@
 import json
 from first_part import prepare_text
+from third_part import compress_file, decompress_file
+
 
 EN_Tokens = {}
 FA_Tokens = {}
@@ -230,6 +232,9 @@ def RemoveDoc(doc_id, lang, inverted_file_path, bigrame_file_path):
                     temp_bigram_index.pop(bigrame)
         Write_Update_Bigrame_Index(temp_bigram_index, bigrame_file_path)
         temp_bigram_index.clear()
+
+    compress_file(inverted_file_path, "gamma", show_print=False)
+    decompress_file(inverted_file_path, "gamma")
     Tokens.pop(doc_id)
 
 

@@ -1,4 +1,3 @@
-import sys
 import os
 import math
 import vbcode
@@ -54,7 +53,7 @@ def unary_decodification(gap): return ft.reduce(lambda x,y : int(x)+int(y),list(
 def get_gaps_list(posting_lists): return [posting_lists[0]]+[posting_lists[i]-posting_lists[i-1] for i in range(1,len(posting_lists))]
 
 
-def compress_file(fileName, coding):
+def compress_file(fileName, coding, show_print=True):
     # determine mode function
     if coding == 'gamma':
         mode = gamma_encoding
@@ -82,8 +81,9 @@ def compress_file(fileName, coding):
     # get the uncompressed file size in KB
     unComp = math.ceil(os.stat(fileName).st_size/1024)
     comp = math.ceil(os.stat(compressedFileName).st_size/1024)
-    print(fileName + ' size before ' + coding + ' compression:', unComp ,'KB')
-    print(fileName + ' size after  ' + coding + ' compression:', comp ,'KB')
+    if show_print:
+        print(fileName + ' size before ' + coding + ' compression:', unComp ,'KB')
+        print(fileName + ' size after  ' + coding + ' compression:', comp ,'KB')
 
 
 def decompress_file(fileName, coding):
