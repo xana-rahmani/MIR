@@ -158,11 +158,6 @@ def Write_New_Bigram_Index(bigram_index, output_path):
         f.write(json.dumps(bigram_index, ensure_ascii=False))
     bigram_index.clear()
 
-
-def AddDoc():
-    pass
-
-
 def RemoveDoc(doc_id, lang, inverted_file_path, bigrame_file_path):
 
     """ get doc tokens """
