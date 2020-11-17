@@ -88,7 +88,6 @@ def relevent_docIDs_with_tf_idf(query, lang="en", part="both"):
     else:
         with open('fa_decompressed.txt', 'r', encoding='utf-8') as f:
             inverted_index = json.loads(f.read())
-        inverted_index = {}
         bigram_path = 'fa_bigrame.txt'
         with open('FA_Tokens.txt', 'r', encoding='utf-8') as f:
             document_tokens = json.loads(f.read())
@@ -178,8 +177,10 @@ def relevent_docIDs_with_tf_idf(query, lang="en", part="both"):
 #     print(document_tokens[str(re)])
 #     print("********")
 
-
-
+# with open('FA_Tokens.txt', 'r', encoding='utf-8') as f:
+#     document_tokens = json.loads(f.read())
+# rel = relevent_docIDs_with_tf_idf('تهران','fa','description')
+# print(rel)
 
 
 
