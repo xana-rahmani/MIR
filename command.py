@@ -11,6 +11,14 @@ import json
 
 def Read_And_AddDocsFile(path, lang="en"):
     if lang == "en":
+        remvoed_Doc_IDs = []
+        try:
+            with open("data/EN_Removed_Docs.csv", encoding='utf-8') as csv_file:
+                read_csv = csv.reader(csv_file)
+                for row in read_csv:
+                    remvoed_Doc_IDs.append(int(row[0]))
+        except:
+            pass
         with open(path, encoding='utf-8') as csv_file:
             read_csv = csv.reader(csv_file)
             fields = next(read_csv)
@@ -18,6 +26,8 @@ def Read_And_AddDocsFile(path, lang="en"):
             description_index = fields.index("description")
             doc_id = 1
             for row in read_csv:
+                if doc_id in remvoed_Doc_IDs:
+                    continue
                 title_tokens = prepare_text(text=row[title_index], lang="en")
                 description_tokens = prepare_text(text=row[description_index], lang="en")
                 EN_Tokens[doc_id] = {
@@ -34,10 +44,20 @@ def Read_And_AddDocsFile(path, lang="en"):
         with open('EN_Tokens.txt', 'w', encoding='utf-8') as f:
             f.write(json.dumps(EN_Tokens, ensure_ascii=False))
     if lang == "fa":
+        remvoed_Doc_IDs = []
+        try:
+            with open("data/FA_Removed_Docs.csv", encoding='utf-8') as csv_file:
+                read_csv = csv.reader(csv_file)
+                for row in read_csv:
+                    remvoed_Doc_IDs.append(int(row[0]))
+        except:
+            pass
         root = Et.parse(path).getroot()
         file_path = "{http://www.mediawiki.org/xml/export-0.10/}"
         i = 1
         for title_tag in root.iter(file_path + 'title'):
+            if i in remvoed_Doc_IDs:
+                continue
             title_tokens = prepare_text(text=title_tag.text, lang="fa")
             FA_Tokens[i] = {
                 "title_token": title_tokens,
@@ -50,6 +70,8 @@ def Read_And_AddDocsFile(path, lang="en"):
             i += 1
         i = 1
         for text_tag in root.iter(file_path + 'text'):
+            if i in remvoed_Doc_IDs:
+                continue
             description_tokens = prepare_text(text=text_tag.text, lang="fa")
             FA_Tokens[i]["description"] = description_tokens
             for tok in description_tokens:
@@ -63,6 +85,8 @@ def Read_And_AddDocsFile(path, lang="en"):
             with open("data/Added_Doc.csv", encoding='utf-8') as csv_file:
                 read_csv = csv.reader(csv_file)
                 for row in read_csv:
+                    if i in remvoed_Doc_IDs:
+                        continue
                     title_tokens = prepare_text(text=row[0], lang="en")
                     description_tokens = prepare_text(text=row[1], lang="en")
                     EN_Tokens[i] = {
@@ -174,7 +198,7 @@ while True:
         print("$ ", end="")
         input_command = input()
         command = input_command.split()
-        if command is None:
+        if command is None or len(command) == 0:
             continue
         if command[0] == "prepare-text":
             # prepare-text en "Hello Modern Information Retrieval"
