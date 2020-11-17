@@ -113,6 +113,15 @@ def relevent_docIDs_with_tf_idf(query, lang="en", part="both"):
         else:
             words_not_found.append(token)
     corrected_tokens = Spell_Checker(words_not_found,bigram_path)
+    corrected_query_tokens = []
+    k = 0
+    for token in query_tokens:
+        if token in inverted_index.keys():
+            corrected_query_tokens.append(token)
+        else:
+            corrected_query_tokens.append(corrected_tokens[k])
+            k += 1
+    query_tokens = corrected_query_tokens
     for token in corrected_tokens:
         idf_token[token] = math.log(N/len(inverted_index[token]))
         doc_ids = []
@@ -159,3 +168,20 @@ def relevent_docIDs_with_tf_idf(query, lang="en", part="both"):
         return [tuple[0] for tuple in result[-10:]][::-1]
     else:
         return [tuple[0] for tuple in result][::-1]
+
+
+# with open('EN_Tokens.txt', 'r', encoding='utf-8') as f:
+#     document_tokens = json.loads(f.read())
+# rel = relevent_docIDs_with_tf_idf('spidir','en','description')
+# print(rel)
+# for re in rel:
+#     print(document_tokens[str(re)])
+#     print("********")
+
+
+
+
+
+
+
+
