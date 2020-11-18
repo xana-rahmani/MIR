@@ -4,7 +4,7 @@ from first_part import prepare_text
 from second_part import Create_Inverted_Index, Create_Bigrame, FA_Tokens, FA_Token_Repetition, EN_Tokens, \
     EN_Token_Repetition, RemoveDoc, AddDoc, Last_Doc_ID, Load__Invert_Index_File, Load__bigrame_Index_File
 from third_part import compress_file, decompress_file
-from fourth_part import Spell_Checker
+from fourth_part import Spell_Checker, edit_distance, jaccard
 from Fifth_part import relevent_docIDs_with_tf_idf
 import json
 
@@ -135,7 +135,7 @@ def Write__Removed_DOC_ID_in_csv(doc_id, lang="en"):
 def ShowRelevantDoc(relevantDocIDs, lang):
     doc_info = {}
     if lang == "en":
-        with open(path, encoding='utf-8') as csv_file:
+        with open('data/ted_talks.csv', encoding='utf-8') as csv_file:
             read_csv = csv.reader(csv_file)
             fields = next(read_csv)
             title_index = fields.index("title")
@@ -149,6 +149,7 @@ def ShowRelevantDoc(relevantDocIDs, lang):
                     }
                 id += 1
     if lang == "fa":
+        path = 'data/Persian.xml'
         root = Et.parse(path).getroot()
         file_path = "{http://www.mediawiki.org/xml/export-0.10/}"
         id = 1
@@ -189,18 +190,36 @@ def ShowRelevantDoc(relevantDocIDs, lang):
 
 
 print("###################  Commands  ########################\n")
-print("- for load doc's file:")
+print("- for sample text preparation:")
+print("\tprepare-text lang text")
+print("- for loading doc's file:")
 print("\tadd-docs-file  input-path  lang")
-print("- for create invert index:")
+print("- for creating invert index:")
 print("\tcreate-invert-index  lang  output-path")
-print("- for remove doc with id:")
-print("\tremove-doc doc_id")
-print("- for show token posting:")
+print("- for creating bigrame:")
+print("\tcreate-bigrame  lang  output-path")
+print("- for showing token posting:")
 print("\tshow-token-posting")
-print("- for show token positions :")
+print("- for showing token positions :")
 print("\tshow-token-positions")
-print("- for show bigrame tokens :")
+print("- for showing bigrame tokens :")
 print("\tshow-bigrame-tokens")
+print("- for removing doc with id:")
+print("\tremove-doc doc_id")
+print("- for adding doc with id:")
+print("\tadd-doc doc_id")
+print("- for file compression:")
+print("\tcompress file-path encoding")
+print("- for file decompression:")
+print("\tdecompress file-path encoding")
+print("- for spell checking:")
+print("\tspell-checker file-path words")
+print("- for getting jaccard distance:")
+print("\tjaccard-distance word1 word2")
+print("- for getting edit distance:")
+print("\tedit-distance word1 word2")
+print("- for querying the system:")
+print("\tquery")
 print("\n#######################################################\n")
 while True:
     try:
@@ -234,63 +253,8 @@ while True:
             lang = command[1]
             output_path = command[2]
             Create_Bigrame(lang, output_path)
-        elif command[0] == "compress":
-            # compress en_inverted.txt gamma
-            # compress en_inverted.txt variableByte
-            # compress fa_inverted.txt gamma
-            # compress fa_inverted.txt variableByte
-            fileName = command[1]
-            coding = command[2]
-            compress_file(fileName, coding)
-        elif command[0] == "decompress":
-            # decompress en_inverted.txt gamma
-            # decompress en_inverted.txt variableByte
-            # decompress fa_inverted.txt gamma
-            # decompress fa_inverted.txt variableByte
-            fileName = command[1]
-            coding = command[2]
-            decompress_file(fileName, coding)
-        elif command[0] == "spell-checker":
-            # spell_checker en_bigrame.txt Spidir
-            bigram_path = command[1]
-            words_not_found = []
-            for w in command[2:]:
-                words_not_found.append(w)
-            temp = Spell_Checker(words_not_found, bigram_path)
-            print(temp)
-        elif command[0] == "remove-doc":
-            # remove-doc 1878 en
-            # remove-doc 146 fa
-            doc_id = command[1]
-            lang = command[2]
-            inverted_file_path = "en_inverted.txt"
-            bigrame_file_path = "en_bigrame.txt"
-            if lang == "fa":
-                inverted_file_path = "fa_inverted.txt"
-                bigrame_file_path = "fa_bigrame.txt"
-            RemoveDoc(int(doc_id), lang, inverted_file_path, bigrame_file_path)
-            Write__Removed_DOC_ID_in_csv(int(doc_id), lang)
-        elif command[0] == "add-doc":
-            print("\t enter doc language\n\t := ", end="")
-            lang = input()
-            print("\t enter doc title\n\t := ", end="")
-            title = input()
-            print("\t enter doc text\n\t := ", end="")
-            text = input()
-            AddDoc(lang=lang,  title=title, text=text)
-            Add_New_Doc_in_csv_file(title, text, lang)
-        elif command[0] == "query":
-            print("\t language\n\t := ", end="")
-            lang = input()
-            print("\t enter query\n\t := ", end="")
-            query = input()
-            print("\t enter the part of document you would like your query to be searched in (title, description, both)"
-                  "\n\t := ", end="")
-            part = input()
-            relevant_docIDs = relevent_docIDs_with_tf_idf(query=query, lang=lang, part=part)
-            print(relevant_docIDs)
-            ShowRelevantDoc(relevant_docIDs, lang)
         elif command[0] == "show-token-posting":
+            # show-token-posting
             print("\t language\n\t := ", end="")
             lang = input()
             print("\t enter token\n\t := ", end="")
@@ -301,6 +265,7 @@ while True:
                 inverted_index = Load__Invert_Index_File("fa_inverted.txt")
             print(inverted_index.get(token))
         elif command[0] == "show-token-positions":
+            # show-token-positions
             print("\t language\n\t := ", end="")
             lang = input()
             print("\t enter token\n\t := ", end="")
@@ -323,6 +288,7 @@ while True:
                         print(j, "  ,  ", end="")
                     print()
         elif command[0] == "show-bigrame-tokens":
+            # show-bigrame-tokens
             print("\t language\n\t := ", end="")
             lang = input()
             print("\t enter your bigrame case:\n\t := ", end="")
@@ -334,5 +300,73 @@ while True:
             temp = inverted_index.get(token, [])
             for i in temp:
                 print(i)
+        elif command[0] == "remove-doc":
+            # remove-doc 1878 en
+            # remove-doc 146 fa
+            doc_id = command[1]
+            lang = command[2]
+            inverted_file_path = "en_inverted.txt"
+            bigrame_file_path = "en_bigrame.txt"
+            if lang == "fa":
+                inverted_file_path = "fa_inverted.txt"
+                bigrame_file_path = "fa_bigrame.txt"
+            RemoveDoc(int(doc_id), lang, inverted_file_path, bigrame_file_path)
+            Write__Removed_DOC_ID_in_csv(int(doc_id), lang)
+        elif command[0] == "add-doc":
+            print("\t enter doc language\n\t := ", end="")
+            lang = input()
+            print("\t enter doc title\n\t := ", end="")
+            title = input()
+            print("\t enter doc text\n\t := ", end="")
+            text = input()
+            AddDoc(lang=lang,  title=title, text=text)
+            Add_New_Doc_in_csv_file(title, text, lang)
+        elif command[0] == "compress":
+            # compress en_inverted.txt gamma
+            # compress en_inverted.txt variableByte
+            # compress fa_inverted.txt gamma
+            # compress fa_inverted.txt variableByte
+            fileName = command[1]
+            coding = command[2]
+            compress_file(fileName, coding)
+        elif command[0] == "decompress":
+            # decompress en_inverted.txt gamma
+            # decompress en_inverted.txt variableByte
+            # decompress fa_inverted.txt gamma
+            # decompress fa_inverted.txt variableByte
+            fileName = command[1]
+            coding = command[2]
+            decompress_file(fileName, coding)
+        elif command[0] == "spell-checker":
+            # spell-checker en_bigrame.txt Spidir
+            bigram_path = command[1]
+            words_not_found = []
+            for w in command[2:]:
+                words_not_found.append(w)
+            temp = Spell_Checker(words_not_found, bigram_path)
+            print(temp)
+        elif command[0] == "jaccard-distance":
+            # jaccard-distance word1 word2
+            word1, word2 = command[1], command[2]
+            w1, w2, l = '$'+word1+'$', '$'+word2+'$', 0
+            for i in range(len(w1)-1):
+                if w1[i:i+2] in w2:
+                    l += 1
+            print(jaccard(word1, w2, l))
+        elif command[0] == "edit-distance":
+            # edit-distance word1 word2
+            word1, word2 = command[1], command[2]
+            print(edit_distance(word1, word2))
+        elif command[0] == "query":
+            print("\t language\n\t := ", end="")
+            lang = input()
+            print("\t enter query\n\t := ", end="")
+            query = input()
+            print("\t enter the part of document you would like your query to be searched in (title, description, both)"
+                  "\n\t := ", end="")
+            part = input()
+            relevant_docIDs = relevent_docIDs_with_tf_idf(query=query, lang=lang, part=part)
+            print(relevant_docIDs)
+            ShowRelevantDoc(relevant_docIDs, lang)
     except Exception as e:
         print("#Error: ", e)
