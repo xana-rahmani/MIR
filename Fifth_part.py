@@ -169,10 +169,10 @@ def relevent_docIDs_with_tf_idf(query, lang="en", part="both"):
         return [tuple[0] for tuple in result][::-1]
 
 
-with open('EN_Tokens.txt', 'r', encoding='utf-8') as f:
-    document_tokens = json.loads(f.read())
-rel = relevent_docIDs_with_tf_idf('spidir','en','both')
-print(rel)
+# with open('EN_Tokens.txt', 'r', encoding='utf-8') as f:
+#     document_tokens = json.loads(f.read())
+# rel = relevent_docIDs_with_tf_idf('spidir','en','both')
+# print(rel)
 # for re in rel:
 #     print(document_tokens[str(re)])
 #     print("********")
