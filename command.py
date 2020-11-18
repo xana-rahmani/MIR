@@ -2,7 +2,7 @@ import csv
 import xml.etree.ElementTree as Et
 from first_part import prepare_text
 from second_part import Create_Inverted_Index, Create_Bigrame, FA_Tokens, FA_Token_Repetition, EN_Tokens, \
-    EN_Token_Repetition, RemoveDoc, AddDoc, Last_Doc_ID
+    EN_Token_Repetition, RemoveDoc, AddDoc, Last_Doc_ID, Load__Invert_Index_File, Load__bigrame_Index_File
 from third_part import compress_file, decompress_file
 from fourth_part import Spell_Checker
 from Fifth_part import relevent_docIDs_with_tf_idf
@@ -195,6 +195,12 @@ print("- for create invert index:")
 print("\tcreate-invert-index  lang  output-path")
 print("- for remove doc with id:")
 print("\tremove-doc doc_id")
+print("- for show token posting:")
+print("\tshow-token-posting")
+print("- for show token positions :")
+print("\tshow-token-positions")
+print("- for show bigrame tokens :")
+print("\tshow-bigrame-tokens")
 print("\n#######################################################\n")
 while True:
     try:
@@ -284,5 +290,49 @@ while True:
             relevant_docIDs = relevent_docIDs_with_tf_idf(query=query, lang=lang, part=part)
             print(relevant_docIDs)
             ShowRelevantDoc(relevant_docIDs, lang)
+        elif command[0] == "show-token-posting":
+            print("\t language\n\t := ", end="")
+            lang = input()
+            print("\t enter token\n\t := ", end="")
+            token = input()
+            if lang == "en":
+                inverted_index = Load__Invert_Index_File("en_inverted.txt")
+            if lang == "fa":
+                inverted_index = Load__Invert_Index_File("fa_inverted.txt")
+            print(inverted_index.get(token))
+        elif command[0] == "show-token-positions":
+            print("\t language\n\t := ", end="")
+            lang = input()
+            print("\t enter token\n\t := ", end="")
+            token = input()
+            if lang == "en":
+                inverted_index = Load__Invert_Index_File("en_inverted.txt")
+            if lang == "fa":
+                inverted_index = Load__Invert_Index_File("fa_inverted.txt")
+            token_posting = inverted_index.get(token)
+            for i in token_posting:
+                print("\ntoken position in doc ", i.get("doc_ID"))
+                if i.get("title_positions"):
+                    print("\t#titile: ", end="")
+                    for j in i.get("title_positions"):
+                        print(j, "  ,  ", end="")
+                    print()
+                if i.get("description_positions"):
+                    print("\t#description: ", end="")
+                    for j in i.get("description_positions"):
+                        print(j, "  ,  ", end="")
+                    print()
+        elif command[0] == "show-bigrame-tokens":
+            print("\t language\n\t := ", end="")
+            lang = input()
+            print("\t enter your bigrame case:\n\t := ", end="")
+            token = input()
+            if lang == "en":
+                inverted_index = Load__bigrame_Index_File("en_bigrame.txt")
+            if lang == "fa":
+                inverted_index = Load__bigrame_Index_File("fa_bigrame.txt")
+            temp = inverted_index.get(token, [])
+            for i in temp:
+                print(i)
     except Exception as e:
         print("#Error: ", e)
