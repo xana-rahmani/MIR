@@ -1,8 +1,11 @@
 /.idea
 /__pycache__
-/data
 /venv
-english_bigram.txt
-english_index.txt
-persian_bigram.txt
-persian_index.txt
+
+/Phase1/data
+/Phase2/data
+
+/Phase1/english_bigram.txt
+/Phase1/english_index.txt
+/Phase1/persian_bigram.txt
+/Phase1/persian_index.txt

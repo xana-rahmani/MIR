@@ -1,0 +1,91 @@
+# from NaiveBayes import *
+from Phase2.SVM import *
+from Phase2.Random_Forest import *
+from Phase2.Vector_Creation import *
+import json
+
+
+def classifier_evaluation(clf, x_test, y_test, type):
+    if type == 'SVM' or type == 'Random Forrest':
+        classifier_outputs = clf.predict(x_test)
+        true_positives = 0
+        true_negatives = 0
+        false_positives = 0
+        false_negatives = 0
+        for i in range(len(classifier_outputs)):
+            if y_test[i] == 1 and classifier_outputs[i] == 1:
+                true_positives += 1
+            elif y_test[i] == -1 and classifier_outputs[i] == 1:
+                false_positives += 1
+            elif y_test[i] == -1 and classifier_outputs[i] == -1:
+                true_negatives += 1
+            elif y_test[i] == 1 and classifier_outputs[i] == -1:
+                false_negatives += 1
+        accuracy = (true_positives + true_negatives)/(true_positives + true_negatives + false_positives + false_negatives)
+        precision = true_positives/(true_positives + false_positives)
+        recall = true_positives/(true_positives + false_negatives)
+        F1_score = (2 * precision * recall)/(precision + recall)
+        print("Accuracy : ", accuracy)
+        print("Precision : ", precision)
+        print("Recall : ", recall)
+        print("F1 score : ", F1_score)
+        print("********************")
+        return accuracy, precision, recall, F1_score
+
+
+X, Y, idf, all_tokens = train_documents_to_vectors('data/train.csv')
+x_test, y_test = other_documents_to_vectors('data/test.csv', idf, all_tokens,True)
+
+
+#############################
+#   SVM Training
+#############################
+svm_classifiers = []
+c = 0.5
+for i in range(4):
+    svm_classifier = create_SVM_classifier(X[0:int(0.9 * len(X))], Y[0:int(0.9 * len(Y))], c)
+    accuracy, precision, recall, F1_score = classifier_evaluation(svm_classifier, X[int(0.9 * len(X)):], Y[int(0.9 * len(Y)):], 'SVM')
+    # evaluating the SVM classifier based on validation set
+    print("Evaluating SVM for C = ", c)
+    c += 0.5
+    svm_classifiers.append(svm_classifier)
+
+# using the results, we use SVM classifier with C = 2
+svm_classifier = svm_classifiers[3]
+# evaluating the SVM classifier based on test set
+
+print("Evaluating SVM classifier with C = 2 on test set :")
+classifier_evaluation(svm_classifier, x_test, y_test, 'SVM')
+
+
+#############################
+#   Random Forest training
+#############################
+random_forest_classifier = create_Random_Forest_classifier(X, Y)
+print("Evaluating Random Forest classifier with test set :")
+classifier_evaluation(random_forest_classifier, x_test, y_test, 'Random Forrest')
+
+
+#############################
+#   Naive Bayes training
+#############################
+
+#############################
+#   KNN training
+#############################
+
+
+#############################
+#   Labeling The Data from Phase1
+#############################
+
+# chosen_classifier = ''
+# X_Data,temp = other_documents_to_vectors('ted_talks.csv',idf,all_tokens,False)
+#
+# document_classification = {}#doc id to class
+# for i,data in enumerate(X_Data):
+#     document_classification[i] = chosen_classifier.predict([data])[0]
+# with open('document_classifications.txt', 'w',encoding='utf-8') as f:
+#     f.write(json.dumps(document_classification))
+
+
