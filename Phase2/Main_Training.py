@@ -42,38 +42,38 @@ X_test, y_test = other_documents_to_vectors('data/test.csv', idf, all_tokens, Tr
 #   SVM Training
 #############################
 
-# svm_classifiers = []
-# c = 0.5
-# for i in range(4):
-#     svm_classifier = create_SVM_classifier(X[0:int(0.9 * len(X))], y[0:int(0.9 * len(y))], c)
-#     # evaluating the SVM classifier based on validation set
-#     print("Evaluating SVM for C = ", c)
-#     accuracy, precision, recall, F1_score = classifier_evaluation(svm_classifier,X[int(0.9 * len(X)) : ], y[int(0.9 * len(y)) : ])
-#     c += 0.5
-#     svm_classifiers.append(svm_classifier)
-#
-# # using the results, we use SVM classifier with C = 1
-# svm_classifier = svm_classifiers[1]
-# # evaluating the SVM classifier based on test set
-#
-# print("Evaluating SVM classifier with C = 1 on test set :")
-# classifier_evaluation(svm_classifier,X_test,y_test)
+svm_classifiers = []
+c = 0.5
+for i in range(4):
+    svm_classifier = create_SVM_classifier(X[0:int(0.9 * len(X))], y[0:int(0.9 * len(y))], c)
+    # evaluating the SVM classifier based on validation set
+    print("Evaluating SVM for C = ", c)
+    accuracy, precision, recall, F1_score = classifier_evaluation(svm_classifier,X[int(0.9 * len(X)) : ], y[int(0.9 * len(y)) : ])
+    c += 0.5
+    svm_classifiers.append(svm_classifier)
+
+# using the results, we use SVM classifier with C = 1
+svm_classifier = svm_classifiers[1]
+# evaluating the SVM classifier based on test set
+
+print("Evaluating SVM classifier with C = 1 on test set :")
+classifier_evaluation(svm_classifier,X_test,y_test)
 
 #############################
 #   Random Forest training
 #############################
-# random_forest_classifier = create_Random_Forest_classifier(X,y)
-# print("Evaluating Random Forest classifier with test set :")
-# classifier_evaluation(random_forest_classifier,X_test,y_test)
+random_forest_classifier = create_Random_Forest_classifier(X,y)
+print("Evaluating Random Forest classifier with test set :")
+classifier_evaluation(random_forest_classifier,X_test,y_test)
 
 
 #############################
 #   Naive Bayes training
 #############################
-# naive_Bayes_classifier = Naive_Bayes_classifier()
-# naive_Bayes_classifier.fit(X, y)
-# print("Evaluating Naive Bayes classifier with test set :")
-# classifier_evaluation(naive_Bayes_classifier, X_test, y_test)
+naive_Bayes_classifier = Naive_Bayes_classifier()
+naive_Bayes_classifier.fit(X, y)
+print("Evaluating Naive Bayes classifier with test set :")
+classifier_evaluation(naive_Bayes_classifier, X_test, y_test)
 
 #############################
 #   KNN training
