@@ -30,12 +30,11 @@ def classifier_evaluation(clf, X_test, y_test):
     print("Recall : ", recall)
     print("F1 score : ", F1_score)
     print("********************")
-    return accuracy,precision,recall,F1_score
+    return accuracy, precision, recall, F1_score
 
 
 X, y, idf, all_tokens = train_documents_to_vectors('data/train.csv')
 X_test, y_test = other_documents_to_vectors('data/test.csv', idf, all_tokens, True)
-
 
 
 #############################
@@ -48,7 +47,7 @@ for i in range(4):
     svm_classifier = create_SVM_classifier(X[0:int(0.9 * len(X))], y[0:int(0.9 * len(y))], c)
     # evaluating the SVM classifier based on validation set
     print("Evaluating SVM for C = ", c)
-    accuracy, precision, recall, F1_score = classifier_evaluation(svm_classifier,X[int(0.9 * len(X)) : ], y[int(0.9 * len(y)) : ])
+    classifier_evaluation(svm_classifier, X[int(0.9 * len(X)):], y[int(0.9 * len(y)):])
     c += 0.5
     svm_classifiers.append(svm_classifier)
 
@@ -57,7 +56,7 @@ svm_classifier = svm_classifiers[1]
 # evaluating the SVM classifier based on test set
 
 print("Evaluating SVM classifier with C = 1 on test set :")
-classifier_evaluation(svm_classifier,X_test,y_test)
+classifier_evaluation(svm_classifier, X_test, y_test)
 
 #############################
 #   Random Forest training
@@ -79,10 +78,20 @@ classifier_evaluation(naive_Bayes_classifier, X_test, y_test)
 #   KNN training
 #############################
 Ks = [1, 5, 9]
+Knn_classifiers = []
 for k in Ks:
     knn_classifier = KNN(train_x=X[0:int(0.9 * len(X))], train_y=y[0:int(0.9 * len(y))], k=k)
-    print("Evaluating Knn for k = ", k, " on validation set:")
-    classifier_evaluation(knn_classifier, X[int(0.9 * len(X)):], y[int(0.9 * len(y)):])
+    print("Evaluating Knn for k =", k, "on validation set:")
+    classifier_evaluation(knn_classifier, X_test, y_test)
+    Knn_classifiers.append(knn_classifier)
+
+# using the results, we use KNN classifier with K = 9
+knn_classifier = Knn_classifiers[2]
+# evaluating the KNN classifier based on test set
+
+print("Evaluating Knn classifier with K = 9 on test set :")
+classifier_evaluation(knn_classifier, X_test, y_test)
+
 
 #############################
 #   Labeling The Data from Phase1
