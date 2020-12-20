@@ -4,7 +4,6 @@ from Phase2.Random_Forest import *
 from Phase2.Vector_Creation import *
 import json
 def classifier_evaluation(clf,X_test,y_test):
-
     classifier_outputs = clf.predict(X_test)
     true_positives = 0
     true_negatives = 0
@@ -44,17 +43,17 @@ svm_classifiers = []
 c = 0.5
 for i in range(4):
     svm_classifier = create_SVM_classifier(X[0:int(0.9 * len(X))], y[0:int(0.9 * len(y))], c)
-    accuracy, precision, recall, F1_score = classifier_evaluation(svm_classifier,X[int(0.9 * len(X)) : ], y[int(0.9 * len(y)) : ])
     # evaluating the SVM classifier based on validation set
-    print("Evaluating SVM for C = ",c)
+    print("Evaluating SVM for C = ", c)
+    accuracy, precision, recall, F1_score = classifier_evaluation(svm_classifier,X[int(0.9 * len(X)) : ], y[int(0.9 * len(y)) : ])
     c += 0.5
     svm_classifiers.append(svm_classifier)
 
-# using the results, we use SVM classifier with C = 2
-svm_classifier = svm_classifiers[3]
+# using the results, we use SVM classifier with C = 1
+svm_classifier = svm_classifiers[1]
 # evaluating the SVM classifier based on test set
 
-print("Evaluating SVM classifier with C = 2 on test set :")
+print("Evaluating SVM classifier with C = 1 on test set :")
 classifier_evaluation(svm_classifier,X_test,y_test)
 
 #############################
