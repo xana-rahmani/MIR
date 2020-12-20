@@ -31,15 +31,12 @@ def train_documents_to_vectors(path):
                 'doc_ID': doc_id,
                 'repetition': 0
             }
-            if token in tokens[doc_id]['title_token']:  # 't' means title 'd' means description 'b' means both
-                for i in range(len(tokens[doc_id]['title_token'])):
-                    if tokens[doc_id]['title_token'][i] == token:
-                        posting['repetition'] += 1
-            if token in tokens[doc_id]['description']:
-                for i in range(len(tokens[doc_id]['description'])):
-                    if tokens[doc_id]['description'][i] == token:
-                        posting['repetition'] += 1
-
+            for t in tokens[doc_id]['title_token']:
+                if t == token:
+                    posting['repetition'] += 1
+            for t in tokens[doc_id]['description']:
+                if t == token:
+                    posting['repetition'] += 1
             tokens_of_dic.append({'token': token, 'posting': posting, 'doc_id': doc_id})
             # the doc id is also in the 'posting'. but i also added it here to use it in the next line for sorting
     tokens_of_dic = sorted(tokens_of_dic, key=lambda k: (k['token'], k['doc_id']))
@@ -86,7 +83,7 @@ def other_documents_to_vectors(path, idf, all_tokens, is_test=True):
         for row in read_csv:
             title_tokens = prepare_text(text=row[title_index], lang="en")
             description_tokens = prepare_text(text=row[description_index], lang="en")
-            tokens_in_this_document = {}  #tokens to number of repitions
+            tokens_in_this_document = {}  # tokens to number of repetitions
             vector = [0.0 for i in range(N)]
             for token in title_tokens + description_tokens:
                 if token in all_tokens:
