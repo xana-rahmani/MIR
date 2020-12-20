@@ -365,7 +365,11 @@ while True:
             print("\t enter the part of document you would like your query to be searched in (title, description, both)"
                   "\n\t := ", end="")
             part = input()
-            relevant_docIDs = relevent_docIDs_with_tf_idf(query=query, lang=lang, part=part)
+            #phase2
+            print("\t enter the type of view you would like your query to be searched in (-1, 0, 1)"
+                  "\n\t := ", end="")
+            view = input()
+            relevant_docIDs = relevent_docIDs_with_tf_idf(query=query, lang=lang, part=part,view = int(view))
             print(relevant_docIDs)
             ShowRelevantDoc(relevant_docIDs, lang)
     except Exception as e:

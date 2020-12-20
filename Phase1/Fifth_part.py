@@ -70,11 +70,20 @@ def dot_product(v1,v2):
 
 
 ## main function
-def relevent_docIDs_with_tf_idf(query, lang="en", part="both"):
+#phase2
+def relevent_docIDs_with_tf_idf(query, lang="en", part="both",view = 0):
+    #view 0 means the view doesn't matter
+    #***
     query_tokens = prepare_text(query, lang=lang)
     inverted_index = {}
     bigram_path = ''
     document_tokens = {}
+    #phase2
+    views = {}
+    if view!= 0:
+        with open('document_classifications.txt','r', encoding='utf-8') as f:
+            views = json.loads(f.read())
+    #***
     if lang == "en":
         with open('en_decompressed.txt', 'r', encoding='utf-8') as f:
             inverted_index = json.loads(f.read())
@@ -161,6 +170,10 @@ def relevent_docIDs_with_tf_idf(query, lang="en", part="both"):
     for key in document_vectors.keys():
         tf_idf[key] = dot_product(document_vectors[key],query_vector)
     result = sorted(tf_idf.items(), key=operator.itemgetter(1))
+    #phase2
+    if view != 0:
+        result = [result[i] for i in range(len(result)) if views[result[i]] == view]
+    #***
     if len(result) > 10:
         return [tuple[0] for tuple in result[-10:]][::-1]
     else:
