@@ -96,14 +96,14 @@ classifier_evaluation(knn_classifier, X_test, y_test)
 #############################
 #   Labeling The Data from Phase1
 #############################
-# chosen_classifier = ''
-# X_Data,temp = other_documents_to_vectors('ted_talks.csv',idf,all_tokens,False)
-#
-# document_classification = {}#doc id to class
-# for i,data in enumerate(X_Data):
-#     document_classification[i] = chosen_classifier.predict([data])[0]
-# with open('document_classifications.txt', 'w',encoding='utf-8') as f:
-#     f.write(json.dumps(document_classification))
+chosen_classifier = naive_Bayes_classifier
+X_Data,temp = other_documents_to_vectors('data/ted_talks.csv',idf,all_tokens,False)
+
+document_classification = {}#doc id to class
+for i,data in enumerate(X_Data):
+    document_classification[i+1] = chosen_classifier.predict([data])[0]
+with open('../Phase1/document_classifications.txt', 'w',encoding='utf-8') as f:
+    f.write(json.dumps(document_classification))
 
 
 

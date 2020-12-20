@@ -172,7 +172,7 @@ def relevent_docIDs_with_tf_idf(query, lang="en", part="both",view = 0):
     result = sorted(tf_idf.items(), key=operator.itemgetter(1))
     #phase2
     if view != 0:
-        result = [result[i] for i in range(len(result)) if views[result[i]] == view]
+        result = [result[i] for i in range(len(result)) if views[str(result[i])] == view]
     #***
     if len(result) > 10:
         return [tuple[0] for tuple in result[-10:]][::-1]
