@@ -2,9 +2,6 @@
 /__pycache__
 /venv
 
-/Phase1/data
-/Phase2/data
-
 /Phase1/english_bigram.txt
 /Phase1/english_index.txt
 /Phase1/persian_bigram.txt
