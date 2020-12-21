@@ -1,4 +1,6 @@
 import math
+
+
 class Naive_Bayes_classifier:
     def __init__(self):
         self.idf = {}
@@ -6,7 +8,8 @@ class Naive_Bayes_classifier:
         self.Pt0 = {}  # P(t|view = -1)
         self.P_c1 = 0  # probability of view = +1
         self.P_c0 = 0  # probability of view = -1
-    def fit(self,X,y):
+
+    def fit(self, X, y):
 
         B = len(X[0])  # B = |V|  >>  |V| is number of unique tokens in all docs
         T_ctp1 = 0  # number of token in doc with view +1
@@ -52,7 +55,8 @@ class Naive_Bayes_classifier:
 
             self.Pt1[t] = p_tc1
             self.Pt0[t] = p_tc0
-    def predict(self,X_test):
+
+    def predict(self, X_test):
         results = []
         for test_sample in X_test:
             temp1 = 0
@@ -69,11 +73,3 @@ class Naive_Bayes_classifier:
             else:
                 results.append(-1)
         return results
-
-
-
-
-
-
-
-
