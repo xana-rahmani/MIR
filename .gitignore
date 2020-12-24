@@ -6,3 +6,5 @@
 /Phase1/english_index.txt
 /Phase1/persian_bigram.txt
 /Phase1/persian_index.txt
+Phase1/__pycache__/
+Phase2/__pycache__/
